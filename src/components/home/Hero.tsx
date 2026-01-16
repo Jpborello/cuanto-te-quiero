@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
-    { id: 1, src: '/images/hero-main.png', alt: 'Cuanto Te Quiero - Colección Bebé' },
+    { id: 1, src: "/images/hero-main.png", alt: "Cuanto Te Quiero - Colección Bebé" },
 ];
 
 export default function Hero() {
@@ -43,7 +43,7 @@ export default function Hero() {
             onMouseEnter={() => setAutoplay(false)}
             onMouseLeave={() => setAutoplay(true)}
         >
-            {/* Carousel Container - Natural Aspect Ratio */}
+            {/* Imagen del hero */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={index}
@@ -66,7 +66,50 @@ export default function Hero() {
                 </motion.div>
             </AnimatePresence>
 
-            {/* Navigation Buttons - Hidden if only 1 slide */}
+            {/* MARCA */}
+            <div className="hero-brand">
+                {/* CUANTO */}
+                <div className="hero-brand-top">
+                    <svg viewBox="0 0 500 120" width="500" height="120">
+                        <path
+                            id="curve-top"
+                            d="M 50 100 Q 250 20 450 100"
+                            fill="transparent"
+                        />
+                        <text>
+                            <textPath
+                                href="#curve-top"
+                                startOffset="50%"
+                                textAnchor="middle"
+                            >
+                                CUANTO
+                            </textPath>
+                        </text>
+                    </svg>
+                </div>
+
+                {/* TE QUIERO */}
+                <div className="hero-brand-bottom">
+                    <svg viewBox="0 0 500 160" width="500" height="160">
+                        <path
+                            id="curve-bottom"
+                            d="M 50 40 Q 250 140 450 40"
+                            fill="transparent"
+                        />
+                        <text>
+                            <textPath
+                                href="#curve-bottom"
+                                startOffset="50%"
+                                textAnchor="middle"
+                            >
+                                TE QUIERO
+                            </textPath>
+                        </text>
+                    </svg>
+                </div>
+            </div>
+
+            {/* Navegación */}
             {slides.length > 1 && (
                 <>
                     <button
@@ -85,13 +128,13 @@ export default function Hero() {
                         <ChevronRight size={24} />
                     </button>
 
-                    {/* Dot Indicators */}
                     <div className="hero-dots-container">
                         {slides.map((_, slideIndex) => (
                             <motion.button
                                 key={slideIndex}
                                 onClick={() => goToSlide(slideIndex)}
-                                className={`hero-dot ${slideIndex === index ? 'active' : 'inactive'}`}
+                                className={`hero-dot ${slideIndex === index ? "active" : "inactive"
+                                    }`}
                                 aria-label={`Ir a slide ${slideIndex + 1}`}
                             />
                         ))}
