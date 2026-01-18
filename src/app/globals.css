@@ -78,7 +78,7 @@ a {
     display: flex;
     flex-direction: column;
     gap: 3rem;
-    padding: 1.5rem;
+    padding: 1rem;
     padding-top: 2rem;
     max-width: 80rem;
     margin: 0 auto;
@@ -136,6 +136,18 @@ a {
     transform: translateY(150px);
 }
 
+/* Mobile: Adjust positioning */
+@media (max-width: 768px) {
+    .hero-brand-top {
+        margin-bottom: -8rem;
+    }
+
+    .hero-brand-bottom {
+        margin-top: 15rem;
+        transform: translateY(80px);
+    }
+}
+
 /* Tipografía SVG compartida */
 .hero-brand-top svg text,
 .hero-brand-bottom svg text {
@@ -157,6 +169,19 @@ a {
     font-size: 64px;
     font-weight: 600;
     letter-spacing: 16px;
+}
+
+/* Mobile: Reduce font size and letter spacing */
+@media (max-width: 768px) {
+    .hero-brand-top svg text {
+        font-size: 40px;
+        letter-spacing: 12px;
+    }
+
+    .hero-brand-bottom svg text {
+        font-size: 40px;
+        letter-spacing: 10px;
+    }
 }
 
 .hero-message {
@@ -294,7 +319,13 @@ a {
     height: 700px;
     z-index: 1;
     overflow: hidden;
+}
 
+/* Mobile: Reduce hero height */
+@media (max-width: 768px) {
+    .hero-container {
+        height: 500px;
+    }
 }
 
 .hero-container::after {
