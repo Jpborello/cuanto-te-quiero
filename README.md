@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cuanto Te Quiero - E-commerce
 
-## Getting Started
+E-commerce completo para productos de bebés y maternidad con panel de administración integrado.
 
-First, run the development server:
+## 🚀 Características Principales
+
+- ✅ **E-commerce Frontend** - Tienda online con diseño responsive
+- ✅ **Panel de Administración** - Gestión completa de productos, categorías y pedidos
+- ✅ **Base de Datos Supabase** - Backend serverless con autenticación
+- ✅ **Diseño Responsive** - Optimizado para móvil, tablet y desktop
+- ✅ **Sistema de Imágenes** - Múltiples imágenes por producto + GIF animado
+
+## 📋 Requisitos Previos
+
+- Node.js 18+ 
+- npm o yarn
+- Cuenta de Supabase
+- Cuenta de Vercel (para deployment)
+
+## 🛠️ Instalación
 
 ```bash
+# Clonar el repositorio
+git clone [tu-repo-url]
+cd cuanto-te-quiero
+
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno
+cp .env.local.example .env.local
+# Editar .env.local con tus credenciales de Supabase
+
+# Iniciar servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔑 Variables de Entorno
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Crear archivo `.env.local` con:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_supabase_anon_key
+```
 
-## Learn More
+## 📁 Estructura del Proyecto
 
-To learn more about Next.js, take a look at the following resources:
+```
+cuanto-te-quiero/
+├── src/
+│   ├── app/
+│   │   ├── (shop)/          # E-commerce frontend
+│   │   │   ├── page.tsx     # Home page
+│   │   │   └── layout.tsx   # Layout del shop
+│   │   ├── admin/           # Panel de administración
+│   │   │   ├── (protected)/ # Rutas protegidas
+│   │   │   │   ├── dashboard/
+│   │   │   │   ├── products/
+│   │   │   │   ├── categories/
+│   │   │   │   ├── orders/
+│   │   │   │   └── gift-cards/
+│   │   │   └── login/       # Login de admin
+│   │   └── globals.css      # Estilos globales
+│   ├── components/
+│   │   ├── shop/            # Componentes del e-commerce
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   └── ProductGrid.tsx
+│   │   └── admin/           # Componentes del admin
+│   │       ├── ProductForm.tsx
+│   │       ├── CategoryManager.tsx
+│   │       └── GiftCardManager.tsx
+│   └── lib/
+│       ├── supabase.ts      # Cliente de Supabase
+│       └── isAdmin.ts       # Verificación de admin
+├── public/
+│   └── images/              # Imágenes estáticas
+└── package.json
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Stack Tecnológico
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: Next.js 14 (App Router)
+- **Lenguaje**: TypeScript
+- **Estilos**: CSS Puro (sin Tailwind)
+- **Base de Datos**: Supabase (PostgreSQL)
+- **Autenticación**: Supabase Auth
+- **Storage**: Supabase Storage
+- **Deployment**: Vercel
+- **Iconos**: Lucide React
 
-## Deploy on Vercel
+## 🔐 Acceso al Admin
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Ir a `/admin/login`
+2. Ingresar credenciales de admin (configuradas en Supabase)
+3. Acceder al dashboard
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📚 Documentación Adicional
+
+- [FEATURES.md](./FEATURES.md) - Lista completa de funcionalidades
+- [USER_GUIDE.md](./USER_GUIDE.md) - Guía para usuarios del admin
+- [TECHNICAL_DOCS.md](./TECHNICAL_DOCS.md) - Documentación técnica
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Guía de deployment
+
+## 🚀 Deployment en Vercel
+
+1. Conectar repositorio a Vercel
+2. Configurar variables de entorno
+3. Deploy automático en cada push a `main`
+
+Ver [DEPLOYMENT.md](./DEPLOYMENT.md) para instrucciones detalladas.
+
+## 🐛 Troubleshooting
+
+### Error: "supabaseUrl is required"
+- Verificar que las variables de entorno estén configuradas
+- En Vercel: Settings → Environment Variables
+
+### Productos no se muestran
+- Verificar RLS policies en Supabase
+- Verificar que los productos estén activos (`active = true`)
+
+### Error de autenticación
+- Verificar credenciales en tabla `admins`
+- Verificar que el email esté registrado
+
+## 📝 Licencia
+
+Proyecto privado - Todos los derechos reservados
+
+## 👥 Contacto
+
+Para soporte o consultas, contactar a [tu-email]
