@@ -4,8 +4,9 @@ import Hero from "@/components/home/Hero";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import ProductGrid from "@/components/shop/ProductGrid";
+import CategoriesGrid from "@/components/shop/CategoriesGrid";
 import Link from "next/link";
-import { ArrowRight, Baby, Heart, Gift } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
     return (
@@ -68,7 +69,7 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    {/* Sección Colecciones */}
+                    {/* Sección Categorías */}
                     <div className="collections-container" style={{ marginBottom: '4rem' }}>
                         <h3 className="section-title" style={{
                             fontSize: '2rem',
@@ -77,142 +78,9 @@ export default function Home() {
                             marginBottom: '2.5rem',
                             color: '#333'
                         }}>
-                            Explorá nuestras colecciones
+                            Nuestras Categorías
                         </h3>
-                        <div className="collections-grid" style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                            gap: '2rem'
-                        }}>
-                            <Link href="/categoria/mundo-bebe" style={{
-                                position: 'relative',
-                                height: '300px',
-                                borderRadius: '20px',
-                                overflow: 'hidden',
-                                textDecoration: 'none',
-                                background: 'linear-gradient(135deg, #add8e6 0%, #87ceeb 100%)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                transition: 'all 0.3s ease'
-                            }} onMouseOver={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-8px)';
-                                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
-                            }} onMouseOut={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    inset: 0,
-                                    background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',
-                                    padding: '2rem'
-                                }}>
-                                    <Baby size={40} style={{ color: 'white', marginBottom: '1rem' }} />
-                                    <h4 style={{
-                                        color: 'white',
-                                        fontSize: '1.75rem',
-                                        fontWeight: 'bold',
-                                        marginBottom: '0.5rem'
-                                    }}>
-                                        Mundo Bebé
-                                    </h4>
-                                    <p style={{
-                                        color: 'rgba(255,255,255,0.9)',
-                                        fontSize: '0.875rem'
-                                    }}>
-                                        Todo lo esencial para tu pequeño
-                                    </p>
-                                </div>
-                            </Link>
-
-                            <Link href="/categoria/dulce-espera" style={{
-                                position: 'relative',
-                                height: '300px',
-                                borderRadius: '20px',
-                                overflow: 'hidden',
-                                textDecoration: 'none',
-                                background: 'linear-gradient(135deg, #ffc0cb 0%, #ff9eb5 100%)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                transition: 'all 0.3s ease'
-                            }} onMouseOver={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-8px)';
-                                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
-                            }} onMouseOut={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    inset: 0,
-                                    background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',
-                                    padding: '2rem'
-                                }}>
-                                    <Heart size={40} style={{ color: 'white', marginBottom: '1rem' }} />
-                                    <h4 style={{
-                                        color: 'white',
-                                        fontSize: '1.75rem',
-                                        fontWeight: 'bold',
-                                        marginBottom: '0.5rem'
-                                    }}>
-                                        Dulce Espera
-                                    </h4>
-                                    <p style={{
-                                        color: 'rgba(255,255,255,0.9)',
-                                        fontSize: '0.875rem'
-                                    }}>
-                                        Acompañamos tu embarazo
-                                    </p>
-                                </div>
-                            </Link>
-
-                            <Link href="/categoria/regaleria" style={{
-                                position: 'relative',
-                                height: '300px',
-                                borderRadius: '20px',
-                                overflow: 'hidden',
-                                textDecoration: 'none',
-                                background: 'linear-gradient(135deg, #fff8dc 0%, #ffeaa7 100%)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                transition: 'all 0.3s ease'
-                            }} onMouseOver={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-8px)';
-                                e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)';
-                            }} onMouseOut={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    inset: 0,
-                                    background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',
-                                    padding: '2rem'
-                                }}>
-                                    <Gift size={40} style={{ color: 'white', marginBottom: '1rem' }} />
-                                    <h4 style={{
-                                        color: 'white',
-                                        fontSize: '1.75rem',
-                                        fontWeight: 'bold',
-                                        marginBottom: '0.5rem'
-                                    }}>
-                                        Regalería
-                                    </h4>
-                                    <p style={{
-                                        color: 'rgba(255,255,255,0.9)',
-                                        fontSize: '0.875rem'
-                                    }}>
-                                        El regalo perfecto
-                                    </p>
-                                </div>
-                            </Link>
-                        </div>
+                        <CategoriesGrid />
                     </div>
 
                     {/* Sección Productos */}
