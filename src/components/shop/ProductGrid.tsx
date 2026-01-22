@@ -16,21 +16,32 @@ interface Product {
     active: boolean;
 }
 
-export default function ProductGrid() {
+interface ProductGridProps {
+    limit?: number; // Número máximo de productos a mostrar
+}
+
+export default function ProductGrid({ limit }: ProductGridProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [limit]);
 
     const fetchProducts = async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from("products")
                 .select("*")
                 .eq("active", true)
                 .order("product_id", { ascending: true });
+
+            // Si hay un límite, aplicarlo
+            if (limit) {
+                query = query.limit(limit);
+            }
+
+            const { data, error } = await query;
 
             if (error) throw error;
             setProducts(data || []);

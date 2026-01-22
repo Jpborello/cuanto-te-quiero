@@ -94,7 +94,7 @@ export default function Home() {
                         }}>
                             Lo más buscado
                         </h3>
-                        <ProductGrid />
+                        <ProductGrid limit={4} />
                     </div>
                 </section>
             </main>
