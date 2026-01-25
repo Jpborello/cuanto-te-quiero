@@ -5,23 +5,21 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
-import { ShoppingCart } from "lucide-react";
+import Link from "next/link";
+import { FolderOpen } from "lucide-react";
+import ImageCarousel from "@/components/shop/ImageCarousel";
 
-interface Product {
-    uid: string;
-    product_id: number;
-    code: string;
+interface Subcategory {
+    id: string;
     name: string;
-    description: string;
-    price: number;
-    stock: number;
-    image_url: string[] | null;
-    active: boolean;
+    category_id: string;
+    images: string[] | null;
 }
 
 interface Category {
     id: string;
     name: string;
+    image_url?: string;
 }
 
 export default function CategoryPage() {
@@ -29,14 +27,14 @@ export default function CategoryPage() {
     const slug = params.slug as string;
 
     const [category, setCategory] = useState<Category | null>(null);
-    const [products, setProducts] = useState<Product[]>([]);
+    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchCategoryAndProducts();
+        fetchCategoryAndSubcategories();
     }, [slug]);
 
-    const fetchCategoryAndProducts = async () => {
+    const fetchCategoryAndSubcategories = async () => {
         try {
             // Convertir slug a nombre de categoría
             const categoryName = slug
@@ -44,26 +42,80 @@ export default function CategoryPage() {
                 .map(word => word.toUpperCase())
                 .join(' ');
 
-            // Buscar categoría
+            // Buscar categoría con match exacto
             const { data: categoryData, error: categoryError } = await supabase
                 .from("categories")
                 .select("*")
-                .ilike("name", `%${categoryName}%`)
+                .eq("name", categoryName)
                 .single();
 
             if (categoryError) throw categoryError;
             setCategory(categoryData);
 
-            // Buscar productos de esta categoría
-            const { data: productsData, error: productsError } = await supabase
-                .from("products")
+            // Buscar subcategorías de esta categoría
+            const { data: subcategoriesData, error: subcategoriesError } = await supabase
+                .from("subcategories")
                 .select("*")
                 .eq("category_id", categoryData.id)
-                .eq("active", true)
-                .order("product_id", { ascending: true });
+                .order("name", { ascending: true });
 
-            if (productsError) throw productsError;
-            setProducts(productsData || []);
+            if (subcategoriesError) throw subcategoriesError;
+
+            // Para cada subcategoría, obtener múltiples imágenes para el carousel
+            const subcategoriesWithImages = await Promise.all(
+                (subcategoriesData || []).map(async (subcategory) => {
+                    // Buscar varios productos de esta subcategoría para el carousel
+                    const { data: productsData } = await supabase
+                        .from("products")
+                        .select(`
+                            image_url,
+                            product_images (
+                                image_url
+                            )
+                        `)
+                        .eq("subcategory_id", subcategory.id)
+                        .eq("active", true)
+                        .limit(4); // Obtener hasta 4 productos
+
+                    // Extraer todas las imágenes disponibles
+                    const allImages: string[] = [];
+
+                    productsData?.forEach(product => {
+                        // Priority 1: Check image_url field first
+                        if (product.image_url) {
+                            if (Array.isArray(product.image_url)) {
+                                allImages.push(...product.image_url);
+                            } else if (typeof product.image_url === 'string') {
+                                try {
+                                    const parsed = JSON.parse(product.image_url);
+                                    if (Array.isArray(parsed)) {
+                                        allImages.push(...parsed);
+                                    } else {
+                                        allImages.push(product.image_url);
+                                    }
+                                } catch {
+                                    allImages.push(product.image_url);
+                                }
+                            }
+                        }
+
+                        // Priority 2: Fallback to product_images table
+                        if (product.product_images && product.product_images.length > 0) {
+                            allImages.push(...product.product_images.map((img: any) => img.image_url));
+                        }
+                    });
+
+                    // Limitar a 4 imágenes máximo y eliminar duplicados
+                    const uniqueImages = [...new Set(allImages)].slice(0, 4);
+
+                    return {
+                        ...subcategory,
+                        images: uniqueImages.length > 0 ? uniqueImages : null
+                    };
+                })
+            );
+
+            setSubcategories(subcategoriesWithImages);
         } catch (error) {
             console.error("Error fetching category:", error);
         } finally {
@@ -120,12 +172,12 @@ export default function CategoryPage() {
                             {category.name}
                         </h1>
                         <p style={{ color: '#666', fontSize: '1.125rem' }}>
-                            {products.length} {products.length === 1 ? 'producto' : 'productos'} disponibles
+                            {subcategories.length} {subcategories.length === 1 ? 'subcategoría' : 'subcategorías'} disponibles
                         </p>
                     </div>
 
-                    {/* Grid de productos */}
-                    {products.length === 0 ? (
+                    {/* Grid de subcategorías */}
+                    {subcategories.length === 0 ? (
                         <div style={{
                             textAlign: 'center',
                             padding: '4rem 2rem',
@@ -134,7 +186,7 @@ export default function CategoryPage() {
                             border: '2px dashed #e0e0e0'
                         }}>
                             <p style={{ fontSize: '1.125rem', color: '#999' }}>
-                                No hay productos disponibles en esta categoría
+                                No hay subcategorías disponibles en esta categoría
                             </p>
                         </div>
                     ) : (
@@ -143,136 +195,67 @@ export default function CategoryPage() {
                             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                             gap: '2rem'
                         }}>
-                            {products.map((product) => (
-                                <div
-                                    key={product.uid}
-                                    style={{
-                                        backgroundColor: 'white',
-                                        borderRadius: '16px',
-                                        overflow: 'hidden',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                                        transition: 'all 0.3s ease',
-                                        cursor: 'pointer'
-                                    }}
-                                    onMouseOver={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-4px)';
-                                        e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.12)';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-                                    }}
+                            {subcategories.map((subcategory) => (
+                                <Link
+                                    key={subcategory.id}
+                                    href={`/categoria/${slug}/${subcategory.name.toLowerCase().replace(/\s+/g, '-')}`}
+                                    style={{ textDecoration: 'none' }}
                                 >
-                                    {/* Image */}
-                                    <div style={{
-                                        width: '100%',
-                                        height: '280px',
-                                        backgroundColor: '#f5f5f5',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        overflow: 'hidden'
-                                    }}>
-                                        {product.image_url && product.image_url.length > 0 ? (
-                                            <img
-                                                src={product.image_url[0]}
-                                                alt={product.name}
-                                                style={{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    objectFit: 'cover'
-                                                }}
-                                            />
-                                        ) : (
-                                            <div style={{ color: '#ccc', fontSize: '4rem' }}>
-                                                📦
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Content */}
-                                    <div style={{ padding: '1.5rem' }}>
-                                        <h3 style={{
-                                            fontSize: '1.125rem',
-                                            fontWeight: '600',
-                                            color: '#333',
-                                            marginBottom: '0.5rem',
+                                    <div
+                                        style={{
+                                            backgroundColor: 'white',
+                                            borderRadius: '16px',
                                             overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap'
-                                        }}>
-                                            {product.name}
-                                        </h3>
-
-                                        <p style={{
-                                            fontSize: '0.875rem',
-                                            color: '#666',
-                                            marginBottom: '1rem',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical'
-                                        }}>
-                                            {product.description}
-                                        </p>
-
-                                        {/* Price and Stock */}
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                            transition: 'all 0.3s ease',
+                                            cursor: 'pointer',
+                                            height: '100%'
+                                        }}
+                                        onMouseOver={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                            e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.12)';
+                                        }}
+                                        onMouseOut={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                                        }}
+                                    >
+                                        {/* Image Carousel */}
                                         <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            marginBottom: '1rem'
+                                            width: '100%',
+                                            height: '280px',
+                                            overflow: 'hidden'
                                         }}>
-                                            <div>
-                                                <span style={{
-                                                    fontSize: '1.5rem',
-                                                    fontWeight: 'bold',
-                                                    color: '#ffc0cb'
-                                                }}>
-                                                    ${product.price.toLocaleString()}
-                                                </span>
-                                            </div>
-                                            <div style={{
-                                                fontSize: '0.75rem',
-                                                color: product.stock > 0 ? '#4caf50' : '#f44336',
-                                                fontWeight: '500'
-                                            }}>
-                                                {product.stock > 0 ? `Stock: ${product.stock}` : 'Sin stock'}
-                                            </div>
+                                            <ImageCarousel
+                                                images={subcategory.images}
+                                                alt={subcategory.name}
+                                            />
                                         </div>
 
-                                        {/* Add to Cart Button */}
-                                        <button
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.75rem',
-                                                backgroundColor: '#ffc0cb',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '8px',
+                                        {/* Content */}
+                                        <div style={{ padding: '1.5rem', textAlign: 'center' }}>
+                                            <h3 style={{
+                                                fontSize: '1.25rem',
+                                                fontWeight: '700',
+                                                color: '#333',
+                                                marginBottom: '0.5rem',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px'
+                                            }}>
+                                                {subcategory.name}
+                                            </h3>
+
+                                            <p style={{
                                                 fontSize: '0.875rem',
+                                                color: '#ffc0cb',
                                                 fontWeight: '600',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '0.5rem',
-                                                transition: 'all 0.2s ease'
-                                            }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#ff6b9d';
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#ffc0cb';
-                                            }}
-                                            disabled={product.stock === 0}
-                                        >
-                                            <ShoppingCart size={16} />
-                                            {product.stock > 0 ? 'Agregar al carrito' : 'Sin stock'}
-                                        </button>
+                                                marginTop: '1rem'
+                                            }}>
+                                                Ver productos →
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
