@@ -55,16 +55,22 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
                         height: '100%',
                         opacity: index === currentIndex ? 1 : 0,
                         transition: 'opacity 0.8s ease-in-out',
-                        backgroundColor: '#f5f5f5'
+                        backgroundColor: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '1rem'
                     }}
                 >
                     <img
                         src={image}
                         alt={`${alt} - imagen ${index + 1}`}
                         style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            width: 'auto',
+                            height: 'auto',
+                            objectFit: 'contain'
                         }}
                     />
                 </div>

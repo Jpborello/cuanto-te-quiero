@@ -1,0 +1,87 @@
+{
+  "totalProducts": 308,
+  "testedCodes": {
+    "8087BB": {
+      "found": false
+    },
+    "8087BA": {
+      "found": false
+    },
+    "8087BR": {
+      "found": false
+    },
+    "N25": {
+      "found": false
+    },
+    "N27": {
+      "found": false
+    },
+    "N28": {
+      "found": false
+    },
+    "N29": {
+      "found": false
+    },
+    "N35": {
+      "found": false
+    },
+    "N36": {
+      "found": false
+    },
+    "N37": {
+      "found": false
+    }
+  },
+  "summary": [
+    {
+      "code": "8087BB",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "8087BA",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "8087BR",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N25",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N27",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N28",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N29",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N35",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N36",
+      "found": false,
+      "name": "NOT FOUND"
+    },
+    {
+      "code": "N37",
+      "found": false,
+      "name": "NOT FOUND"
+    }
+  ]
+}

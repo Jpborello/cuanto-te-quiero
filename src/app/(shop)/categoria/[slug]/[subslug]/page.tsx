@@ -226,20 +226,23 @@ export default function SubcategoryPage() {
                                         <div style={{
                                             width: '100%',
                                             height: '280px',
-                                            backgroundColor: '#f5f5f5',
+                                            backgroundColor: 'white',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            overflow: 'hidden'
+                                            overflow: 'hidden',
+                                            padding: '0.5rem'
                                         }}>
                                             {product.images && product.images.length > 0 ? (
                                                 <img
                                                     src={product.images[0]}
                                                     alt={product.name}
                                                     style={{
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        objectFit: 'cover'
+                                                        maxWidth: '100%',
+                                                        maxHeight: '100%',
+                                                        width: 'auto',
+                                                        height: 'auto',
+                                                        objectFit: 'contain'
                                                     }}
                                                 />
                                             ) : (

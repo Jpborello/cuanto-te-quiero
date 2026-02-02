@@ -2,11 +2,93 @@
 
 import Link from "next/link";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+
+interface Category {
+    id: string;
+    name: string;
+}
 
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [cartCount] = useState(0); // TODO: Connect to cart context
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const { data, error } = await supabase
+                .from("categories")
+                .select("id, name")
+                .order("name", { ascending: true });
+
+            if (error) throw error;
+
+            // Filtrar y ordenar las categorías
+            const filteredCategories = (data || []).filter(cat => cat.name !== "General");
+
+            // Ordenar: Muebles Infantiles primero, luego Blanquería, luego el resto
+            const sortedCategories = filteredCategories.sort((a, b) => {
+                const nameA = a.name.toUpperCase();
+                const nameB = b.name.toUpperCase();
+
+                if (nameA.includes("MUEBLES")) return -1;
+                if (nameB.includes("MUEBLES")) return 1;
+                if (nameA.includes("BLANQUERIA")) return -1;
+                if (nameB.includes("BLANQUERIA")) return 1;
+                return nameA.localeCompare(nameB);
+            });
+
+            setCategories(sortedCategories);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
+
+    const getCategorySlug = (name: string) => {
+        return name.toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[áàäâ]/g, 'a')
+            .replace(/[éèëê]/g, 'e')
+            .replace(/[íìïî]/g, 'i')
+            .replace(/[óòöô]/g, 'o')
+            .replace(/[úùüû]/g, 'u')
+            .replace(/ñ/g, 'n');
+    };
+
+    const isFeaturedCategory = (name: string) => {
+        return name.toUpperCase().includes("MUEBLES");
+    };
+
+    // Asignar colores únicos a cada categoría
+    const getCategoryColor = (name: string) => {
+        const nameUpper = name.toUpperCase();
+
+        // Muebles Infantiles - Marrón
+        if (nameUpper.includes("MUEBLES")) return { color: '#8B4513', hover: '#654321' };
+
+        // Blanquería y Colchones - Verde menta
+        if (nameUpper.includes("BLANQUERIA")) return { color: '#20B2AA', hover: '#17a89a' };
+
+        // Coches y Rodados - Azul cielo
+        if (nameUpper.includes("COCHES") || nameUpper.includes("RODADOS")) return { color: '#4A90E2', hover: '#357ABD' };
+
+        // Accesorios para Bebés - Rosa claro
+        if (nameUpper.includes("ACCESORIOS")) return { color: '#FF69B4', hover: '#FF1493' };
+
+        // Futura Mamá - Rosa suave
+        if (nameUpper.includes("FUTURA") || nameUpper.includes("MAMA")) return { color: '#E91E63', hover: '#C2185B' };
+
+        // Indumentaria - Morado
+        if (nameUpper.includes("INDUMENTARIA")) return { color: '#9C27B0', hover: '#7B1FA2' };
+
+        // Default - Gris
+        return { color: '#666', hover: '#ffc0cb' };
+    };
 
     return (
         <header style={{
@@ -38,48 +120,46 @@ export default function Header() {
                     Cuanto Te Quiero
                 </Link>
 
-                {/* Desktop Navigation */}
+                {/* Desktop Navigation - Dynamic Categories */}
                 <nav style={{
                     display: 'flex',
-                    gap: '2rem',
-                    alignItems: 'center'
+                    gap: '1.5rem',
+                    alignItems: 'center',
+                    flexWrap: 'wrap'
                 }} className="desktop-nav">
-                    <Link href="/categoria/mundo-bebe" style={{
-                        color: '#666',
-                        textDecoration: 'none',
-                        fontWeight: '500',
-                        transition: 'color 0.2s'
-                    }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                        onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                        Mundo Bebé
-                    </Link>
-                    <Link href="/categoria/dulce-espera" style={{
-                        color: '#666',
-                        textDecoration: 'none',
-                        fontWeight: '500',
-                        transition: 'color 0.2s'
-                    }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                        onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                        Dulce Espera
-                    </Link>
-                    <Link href="/categoria/regaleria" style={{
-                        color: '#666',
-                        textDecoration: 'none',
-                        fontWeight: '500',
-                        transition: 'color 0.2s'
-                    }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                        onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                        Regalería
-                    </Link>
-                    <Link href="/ofertas" style={{
-                        color: '#ff6b9d',
-                        textDecoration: 'none',
-                        fontWeight: '600',
-                        transition: 'color 0.2s'
-                    }} onMouseOver={(e) => e.currentTarget.style.color = '#ff4081'}
-                        onMouseOut={(e) => e.currentTarget.style.color = '#ff6b9d'}>
-                        Ofertas
-                    </Link>
+                    {categories.map((category) => {
+                        const isFeatured = isFeaturedCategory(category.name);
+                        const colors = getCategoryColor(category.name);
+                        return (
+                            <Link
+                                key={category.id}
+                                href={`/categoria/${getCategorySlug(category.name)}`}
+                                style={{
+                                    color: colors.color,
+                                    textDecoration: 'none',
+                                    fontWeight: isFeatured ? '700' : '600',
+                                    fontSize: isFeatured ? '1rem' : '0.95rem',
+                                    transition: 'all 0.2s',
+                                    textTransform: 'capitalize',
+                                    whiteSpace: 'nowrap'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.color = colors.hover;
+                                    if (isFeatured) {
+                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                    }
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.color = colors.color;
+                                    if (isFeatured) {
+                                        e.currentTarget.style.transform = 'scale(1)';
+                                    }
+                                }}
+                            >
+                                {category.name}
+                            </Link>
+                        );
+                    })}
                 </nav>
 
                 {/* Search Bar */}
@@ -193,38 +273,25 @@ export default function Header() {
                         flexDirection: 'column',
                         gap: '1rem'
                     }}>
-                        <Link href="/categoria/mundo-bebe" style={{
-                            color: '#666',
-                            textDecoration: 'none',
-                            fontWeight: '500',
-                            padding: '0.5rem 0'
-                        }}>
-                            Mundo Bebé
-                        </Link>
-                        <Link href="/categoria/dulce-espera" style={{
-                            color: '#666',
-                            textDecoration: 'none',
-                            fontWeight: '500',
-                            padding: '0.5rem 0'
-                        }}>
-                            Dulce Espera
-                        </Link>
-                        <Link href="/categoria/regaleria" style={{
-                            color: '#666',
-                            textDecoration: 'none',
-                            fontWeight: '500',
-                            padding: '0.5rem 0'
-                        }}>
-                            Regalería
-                        </Link>
-                        <Link href="/ofertas" style={{
-                            color: '#ff6b9d',
-                            textDecoration: 'none',
-                            fontWeight: '600',
-                            padding: '0.5rem 0'
-                        }}>
-                            Ofertas
-                        </Link>
+                        {categories.map((category) => {
+                            const isFeatured = isFeaturedCategory(category.name);
+                            const colors = getCategoryColor(category.name);
+                            return (
+                                <Link
+                                    key={category.id}
+                                    href={`/categoria/${getCategorySlug(category.name)}`}
+                                    style={{
+                                        color: colors.color,
+                                        textDecoration: 'none',
+                                        fontWeight: isFeatured ? '700' : '600',
+                                        padding: '0.5rem 0',
+                                        textTransform: 'capitalize'
+                                    }}
+                                >
+                                    {category.name}
+                                </Link>
+                            );
+                        })}
                     </nav>
                 </div>
             )}

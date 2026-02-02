@@ -1,0 +1,67 @@
+{
+  "totalChecked": 5,
+  "products": [
+    {
+      "id": 3001,
+      "code": "EKO310AZ",
+      "name": "CUNA BARANDA FIJA 1.30 X 70 C/RUEDAS AZUL",
+      "hasImage": true,
+      "imageUrl": [
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20-%20EKO310/1%20EKO%20AZUL.jpeg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20-%20EKO310/EKO%20310%20Azul.jpg"
+      ],
+      "price": 0,
+      "stock": 10
+    },
+    {
+      "id": 3002,
+      "code": "EKO310BL",
+      "name": "CUNA BARANDA FIJA 1.30 X 70 C/RUEDAS BLANCA",
+      "hasImage": true,
+      "imageUrl": [
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20-%20EKO310/EKO%20310%20Blanco.jpg"
+      ],
+      "price": 0,
+      "stock": 10
+    },
+    {
+      "id": 3003,
+      "code": "EKO310BR",
+      "name": "CUNA BARANDA FIJA 1.30 X 70 C/RUEDAS ROSA",
+      "hasImage": true,
+      "imageUrl": [
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20-%20EKO310/2%20EKO%20ROSA.jpeg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20-%20EKO310/EKO%20310%20Rosa.jpg"
+      ],
+      "price": 0,
+      "stock": 10
+    },
+    {
+      "id": 4001,
+      "code": "N80",
+      "name": "CATRE COLECHO NORDIC 90X60",
+      "hasImage": true,
+      "imageUrl": [
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N80%20CATRE%20COLECHO%2090X60%20CM/N80%20CATRE%20COLECHO.jpg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N80%20CATRE%20COLECHO%2090X60%20CM/N80%20CATRE%20COLECHO(1).jpeg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N80%20CATRE%20COLECHO%2090X60%20CM/N80%20CATRE%20COLECHO(1).jpg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N80%20CATRE%20COLECHO%2090X60%20CM/N80%20COLECHO.jpg"
+      ],
+      "price": 0,
+      "stock": 10
+    },
+    {
+      "id": 4002,
+      "code": "N10",
+      "name": "CUNA CON BARANDA DESLIZABLE Y CAJONES NORDIC",
+      "hasImage": true,
+      "imageUrl": [
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N10%20CUNA%20NORDIC%20BARANDA%20DESLIZABLE/WhatsApp%20Image%202023-04-04%20at%2009.49.31.jpeg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N10%20CUNA%20NORDIC%20BARANDA%20DESLIZABLE/N10%20CUNA%20DESL..jpeg",
+        "https://jrwwfvzgchjzjnapfrar.supabase.co/storage/v1/object/public/cuanto%20te%20quiero/Muebles/CUNAS%20COLECHO/N10%20CUNA%20NORDIC%20BARANDA%20DESLIZABLE/N10%20CUNA%20DESL..jpg"
+      ],
+      "price": 0,
+      "stock": 10
+    }
+  ]
+}

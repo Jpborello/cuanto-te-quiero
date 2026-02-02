@@ -40,12 +40,16 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                 style={{
                     width: '100%',
                     aspectRatio: '1',
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: 'white',
                     borderRadius: '16px',
                     overflow: 'hidden',
                     marginBottom: '1rem',
                     cursor: isZoomed ? 'zoom-out' : 'zoom-in',
-                    position: 'relative'
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '1rem'
                 }}
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
@@ -54,9 +58,11 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                     src={currentImage}
                     alt={`${productName} - imagen ${selectedIndex + 1}`}
                     style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        width: 'auto',
+                        height: 'auto',
+                        objectFit: 'contain',
                         transition: 'transform 0.3s ease',
                         transform: isZoomed ? 'scale(1.5)' : 'scale(1)'
                     }}
@@ -102,9 +108,12 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                                 src={image}
                                 alt={`${productName} - miniatura ${index + 1}`}
                                 style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    width: 'auto',
+                                    height: 'auto',
+                                    objectFit: 'contain',
+                                    margin: 'auto'
                                 }}
                             />
                         </div>

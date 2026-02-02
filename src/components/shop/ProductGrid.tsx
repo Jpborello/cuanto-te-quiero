@@ -12,7 +12,7 @@ interface Product {
     description: string;
     price: number;
     stock: number;
-    image_url: string | null;
+    image_url: string | string[] | null;
     active: boolean;
 }
 
@@ -50,6 +50,15 @@ export default function ProductGrid({ limit }: ProductGridProps) {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Helper function to get image URL (handle both string and array)
+    const getImageUrl = (imageUrl: string | string[] | null): string | null => {
+        if (!imageUrl) return null;
+        if (Array.isArray(imageUrl)) {
+            return imageUrl.length > 0 ? imageUrl[0] : null;
+        }
+        return imageUrl;
     };
 
     if (loading) {
@@ -120,20 +129,23 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                     <div style={{
                         width: '100%',
                         height: '280px',
-                        backgroundColor: '#f5f5f5',
+                        backgroundColor: 'white',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        padding: '0.5rem'
                     }}>
-                        {product.image_url ? (
+                        {getImageUrl(product.image_url) ? (
                             <img
-                                src={product.image_url}
+                                src={getImageUrl(product.image_url)!}
                                 alt={product.name}
                                 style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    width: 'auto',
+                                    height: 'auto',
+                                    objectFit: 'contain'
                                 }}
                             />
                         ) : (

@@ -4,7 +4,7 @@ import Hero from "@/components/home/Hero";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import ProductGrid from "@/components/shop/ProductGrid";
-import CategoriesGrid from "@/components/shop/CategoriesGrid";
+import FeaturedCarousel from "@/components/shop/FeaturedCarousel";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -69,8 +69,8 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    {/* Sección Categorías */}
-                    <div className="collections-container" style={{ marginBottom: '4rem' }}>
+                    {/* Carrusel de Productos Destacados */}
+                    <div className="featured-container" style={{ marginBottom: '4rem' }}>
                         <h3 className="section-title" style={{
                             fontSize: '2rem',
                             fontWeight: 'bold',
@@ -78,9 +78,9 @@ export default function Home() {
                             marginBottom: '2.5rem',
                             color: '#333'
                         }}>
-                            Nuestras Categorías
+                            Productos Destacados
                         </h3>
-                        <CategoriesGrid />
+                        <FeaturedCarousel />
                     </div>
 
                     {/* Sección Productos */}

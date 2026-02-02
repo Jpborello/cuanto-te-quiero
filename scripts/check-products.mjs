@@ -1,76 +1,114 @@
 import { createClient } from '@supabase/supabase-js';
+import { readFileSync, writeFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const supabaseUrl = 'https://jrwwfvzgchjzjnapfrar.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyd3dmdnpnY2hqempuYXBmcmFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1ODQ3MDYsImV4cCI6MjA4NDE2MDcwNn0.ZYNrWkx5SNl0l3ICsF6t3gTU36T3ZYH5fJji6Lp1lPM';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load .env.local
+const envPath = join(__dirname, '..', '.env.local');
+const envContent = readFileSync(envPath, 'utf-8');
+const envVars = {};
+envContent.split('\n').forEach(line => {
+    const [key, value] = line.split('=');
+    if (key && value) {
+        envVars[key.trim()] = value.trim();
+    }
+});
+
+const supabaseUrl = envVars.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function checkProductImages() {
-    console.log('════════════════════════════════════════════════════════');
-    console.log('CHECKING PRODUCTS TABLE FOR IMAGES');
-    console.log('════════════════════════════════════════════════════════\n');
+async function checkProducts() {
+    try {
+        // Get all products
+        const { data: products, error } = await supabase
+            .from('products')
+            .select('product_id, code, name, subcategory_id')
+            .order('product_id');
 
-    // Get products and check image_url field
-    console.log('1️⃣  Sample products with image_url field:');
-    const { data: products, error } = await supabase
-        .from('products')
-        .select('uid, name, code, image_url')
-        .limit(10);
-
-    if (error) {
-        console.error('❌ Error:', error);
-        return;
-    }
-
-    let withImages = 0;
-    let withoutImages = 0;
-
-    products?.forEach((p, idx) => {
-        console.log(`\n${idx + 1}. ${p.name || 'Unnamed'} (${p.code || 'No code'})`);
-        console.log(`   image_url: ${p.image_url || '❌ NULL'}`);
-
-        if (p.image_url) {
-            withImages++;
-            // Check if it's an array or string
-            if (typeof p.image_url === 'string') {
-                console.log(`   Type: STRING`);
-                // Try to parse as JSON
-                try {
-                    const parsed = JSON.parse(p.image_url);
-                    console.log(`   Parsed as JSON array: ${Array.isArray(parsed) ? 'YES' : 'NO'}`);
-                    if (Array.isArray(parsed)) {
-                        console.log(`   Array length: ${parsed.length}`);
-                        parsed.forEach((url, i) => console.log(`     [${i}] ${url}`));
-                    }
-                } catch {
-                    console.log(`   Not JSON - direct URL`);
-                }
-            } else if (Array.isArray(p.image_url)) {
-                console.log(`   Type: ARRAY (length: ${p.image_url.length})`);
-                p.image_url.forEach((url, i) => console.log(`     [${i}] ${url}`));
-            }
-        } else {
-            withoutImages++;
+        if (error) {
+            throw new Error('Error fetching products: ' + error.message);
         }
-    });
 
-    console.log(`\n📊 SUMMARY:`);
-    console.log(`   Products with images: ${withImages}`);
-    console.log(`   Products without images: ${withoutImages}`);
+        const existingCodes = new Set(products?.map(p => p.code) || []);
 
-    // Check specific EKO products
-    console.log('\n2️⃣  Checking EKO310 products (CUNAS):');
-    const { data: ekoProducts } = await supabase
-        .from('products')
-        .select('name, code, image_url')
-        .ilike('code', '%EKO310%');
+        // Read Productos.md
+        const productosPath = join(__dirname, '..', 'Productos.md');
+        const content = readFileSync(productosPath, 'utf-8');
+        const lines = content.split('\n');
 
-    console.log(`Found ${ekoProducts?.length || 0} EKO310 products:`);
-    ekoProducts?.forEach(p => {
-        console.log(`  - ${p.code}: ${p.image_url ? '✅ HAS IMAGE' : '❌ NO IMAGE'}`);
-    });
+        let currentSubcategory = null;
+        const expectedProducts = [];
 
-    console.log('\n════════════════════════════════════════════════════════');
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+
+            // Skip empty lines and main category
+            if (!trimmed || trimmed === 'MUEBLES INFANTILES Y JUVENILES') continue;
+
+            const isIndented = line.startsWith('\t') || line.startsWith(' ');
+
+            // If not indented, it's a subcategory header
+            if (!isIndented && trimmed.length > 0) {
+                currentSubcategory = trimmed;
+                continue;
+            }
+
+            // If indented and we have a subcategory, it's a product
+            if (isIndented && currentSubcategory) {
+                // Try to match product pattern: "CODE NAME"
+                // Code can have letters, numbers, +, and spaces (for combined products like "8083+8088BB")
+                const match = trimmed.match(/^([A-Z0-9+\s]+?)\s+([A-Z].+)$/);
+                if (match) {
+                    const code = match[1].trim().replace(/\s+/g, ' ');
+                    const name = match[2].trim();
+                    expectedProducts.push({
+                        code,
+                        name,
+                        subcategory: currentSubcategory,
+                        lineNumber: i + 1
+                    });
+                }
+            }
+        }
+
+        const missingProducts = expectedProducts.filter(p => !existingCodes.has(p.code));
+
+        // Also find products in DB that are NOT in the MD file
+        const expectedCodes = new Set(expectedProducts.map(p => p.code));
+        const extraProducts = products?.filter(p => !expectedCodes.has(p.code)) || [];
+
+        const result = {
+            totalInDB: products?.length || 0,
+            totalExpected: expectedProducts.length,
+            missingCount: missingProducts.length,
+            extraCount: extraProducts.length,
+            missingProducts: missingProducts,
+            extraProducts: extraProducts.slice(0, 20), // Show first 20 extra
+            allSubcategoriesFound: [...new Set(expectedProducts.map(p => p.subcategory))],
+            sampleExpected: expectedProducts.slice(0, 10)
+        };
+
+        // Save to JSON file
+        const outputPath = join(__dirname, '..', 'check-result.json');
+        writeFileSync(outputPath, JSON.stringify(result, null, 2));
+
+        console.log('Results saved to check-result.json');
+        console.log(`Total in DB: ${result.totalInDB}`);
+        console.log(`Total expected from Productos.md: ${result.totalExpected}`);
+        console.log(`Missing from DB: ${result.missingCount}`);
+        console.log(`Extra in DB (not in MD): ${result.extraCount}`);
+        console.log(`\nSubcategories found: ${result.allSubcategoriesFound.join(', ')}`);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        process.exit(1);
+    }
 }
 
-checkProductImages().catch(console.error);
+checkProducts().catch(console.error);
