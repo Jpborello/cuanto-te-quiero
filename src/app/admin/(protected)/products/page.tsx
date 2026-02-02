@@ -1,8 +1,23 @@
 
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { Plus, Image as ImageIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import ProductActions from "@/components/admin/ProductActions";
+
+// Group products by subcategory
+function groupBySubcategory(products: any[]) {
+    const grouped = new Map<string, any[]>();
+
+    products.forEach(product => {
+        const subcategoryName = product.subcategories?.name || 'Sin Subcategoría';
+        if (!grouped.has(subcategoryName)) {
+            grouped.set(subcategoryName, []);
+        }
+        grouped.get(subcategoryName)!.push(product);
+    });
+
+    return Array.from(grouped.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+}
 
 export default async function AdminProducts() {
     const supabase = await createClient();
@@ -14,14 +29,19 @@ export default async function AdminProducts() {
             categories (name),
             subcategories (name)
         `)
-        .order("created_at", { ascending: false });
+        .order("subcategories(name)", { ascending: true })
+        .order("name", { ascending: true });
+
+    const groupedProducts = products ? groupBySubcategory(products) : [];
 
     return (
         <div>
             <div className="page-header-actions">
                 <div>
                     <h1 className="admin-page-title">Productos</h1>
-                    <p className="admin-page-subtitle">Administra tu catálogo</p>
+                    <p className="admin-page-subtitle">
+                        {products?.length || 0} productos en {groupedProducts.length} subcategorías
+                    </p>
                 </div>
                 <Link href="/admin/products/new" className="btn-primary">
                     <Plus size={18} />
@@ -29,83 +49,80 @@ export default async function AdminProducts() {
                 </Link>
             </div>
 
-            <div className="admin-card">
-                {error && <p className="text-red-500 p-4">Error: {error.message}</p>}
+            {error && (
+                <div className="admin-card">
+                    <p style={{ color: '#ef4444', padding: '1rem' }}>Error: {error.message}</p>
+                </div>
+            )}
 
-                {!products || products.length === 0 ? (
-                    <div className="text-center p-12 text-gray-400">
+            {!products || products.length === 0 ? (
+                <div className="admin-card">
+                    <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af' }}>
                         <p>No hay productos cargados.</p>
                     </div>
-                ) : (
-                    <div className="table-container">
-                        <table className="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Imagen</th>
-                                    <th>Nombre</th>
-                                    <th>Categoría</th>
-                                    <th>Precio</th>
-                                    <th>Stock</th>
-                                    <th>Estado</th>
-                                    <th className="text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {products.map((product) => (
-                                    <tr key={product.id} className={!product.active ? "opacity-60 bg-gray-50" : ""}>
-                                        <td>
-                                            <div className="w-10 h-10 bg-slate-100 rounded overflow-hidden flex items-center justify-center">
-                                                {product.image_url ? (
-                                                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <ImageIcon size={16} className="text-gray-400" />
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="font-medium">{product.name}</div>
-                                        </td>
-                                        <td>
-                                            <div className="text-sm">
-                                                <span className="font-medium text-gray-700">
-                                                    {product.categories?.name || '---'}
-                                                </span>
-                                                {product.subcategories && (
-                                                    <span className="text-gray-500 text-xs block">
-                                                        {product.subcategories.name}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="font-mono">
-                                            ${product.price?.toFixed(2)}
-                                        </td>
-                                        <td>
-                                            <span className={`px-2 py-1 rounded text-xs font-bold ${product.stock < 5 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                    {groupedProducts.map(([subcategoryName, subcategoryProducts]) => (
+                        <div key={subcategoryName} className="admin-card">
+                            {/* Subcategory Header */}
+                            <div className="subcategory-header">
+                                <h2 className="subcategory-title">
+                                    {subcategoryName}
+                                </h2>
+                                <p className="subcategory-subtitle">
+                                    {subcategoryProducts[0].categories?.name || 'Sin categoría'} • {subcategoryProducts.length} productos
+                                </p>
+                            </div>
+
+                            {/* Products Grid */}
+                            <div className="products-grid">
+                                {subcategoryProducts.map((product) => (
+                                    <div
+                                        key={product.uid}
+                                        className={`product-card ${!product.active ? 'inactive' : ''}`}
+                                    >
+                                        {/* Product Name */}
+                                        <h3 className="product-card-name">
+                                            {product.name}
+                                        </h3>
+
+                                        {/* Code */}
+                                        <p className="product-card-code">
+                                            {product.code || '---'}
+                                        </p>
+
+                                        {/* Price & Stock */}
+                                        <div className="product-card-stats">
+                                            <span className="product-card-price">
+                                                ${product.price?.toFixed(2)}
+                                            </span>
+                                            <span className={`product-card-stock ${product.stock < 5 ? 'low' : 'ok'}`}>
                                                 {product.stock}
                                             </span>
-                                        </td>
-                                        <td>
-                                            {product.active ? (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                                                    Activo
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                                    Inactivo
-                                                </span>
+                                        </div>
+
+                                        {/* Badges */}
+                                        <div className="product-card-badges">
+                                            {product.featured && (
+                                                <span className="product-card-featured" title="Destacado">⭐</span>
                                             )}
-                                        </td>
-                                        <td className="text-right">
+                                            <span className={`product-card-status ${product.active ? 'active' : 'inactive'}`}>
+                                                {product.active ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="product-card-actions">
                                             <ProductActions product={product} />
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

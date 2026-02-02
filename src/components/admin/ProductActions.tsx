@@ -17,7 +17,7 @@ export default function ProductActions({ product }: { product: any }) {
             const { error } = await supabase
                 .from("products")
                 .update({ active: !product.active })
-                .eq("id", product.id);
+                .eq("uid", product.uid);
 
             if (error) throw error;
             router.refresh();
@@ -35,7 +35,7 @@ export default function ProductActions({ product }: { product: any }) {
             const { error } = await supabase
                 .from("products")
                 .update({ featured: !product.featured })
-                .eq("id", product.id);
+                .eq("uid", product.uid);
 
             if (error) throw error;
             router.refresh();
@@ -65,7 +65,7 @@ export default function ProductActions({ product }: { product: any }) {
             >
                 <Power size={18} />
             </button>
-            <Link href={`/admin/products/${product.id}`} className="action-btn edit">
+            <Link href={`/admin/products/${product.uid}`} className="action-btn edit">
                 <Pencil size={18} />
             </Link>
         </div>

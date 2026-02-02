@@ -1,96 +1,42 @@
 import { createClient } from '@supabase/supabase-js';
-import * as dotenv from 'dotenv';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Load .env.local
-dotenv.config({ path: join(__dirname, '..', '.env.local') });
+const envPath = join(__dirname, '..', '.env.local');
+const envContent = readFileSync(envPath, 'utf-8');
+const envVars = {};
+envContent.split('\n').forEach(line => {
+    const [key, value] = line.split('=');
+    if (key && value) {
+        envVars[key.trim()] = value.trim();
+    }
+});
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase credentials in .env.local');
-    process.exit(1);
-}
-
+const supabaseUrl = envVars.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = envVars.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function checkSchema() {
-    console.log('='.repeat(70));
-    console.log('DATABASE SCHEMA CHECK');
-    console.log('='.repeat(70));
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .limit(1);
 
-    // 1. Check categories structure
-    console.log('\n1. CATEGORIES:');
-    const { data: categories, error: catError } = await supabase
-        .from('categories')
-        .select('*')
-        .limit(3);
+        if (error) throw error;
 
-    if (catError) {
-        console.error('Error:', catError);
-    } else {
-        console.table(categories);
-        if (categories && categories.length > 0) {
-            console.log('Columns:', Object.keys(categories[0]));
+        if (data && data.length > 0) {
+            console.log('\nColumnas de la tabla products:');
+            console.log(Object.keys(data[0]).join(', '));
         }
+    } catch (error) {
+        console.error('Error:', error.message);
     }
-
-    // 2. Check subcategories structure
-    console.log('\n2. SUBCATEGORIES:');
-    const { data: subcategories, error: subError } = await supabase
-        .from('subcategories')
-        .select('*')
-        .limit(5);
-
-    if (subError) {
-        console.error('Error:', subError);
-    } else {
-        console.table(subcategories);
-        if (subcategories && subcategories.length > 0) {
-            console.log('Columns:', Object.keys(subcategories[0]));
-        }
-    }
-
-    // 3. Check products structure
-    console.log('\n3. PRODUCTS:');
-    const { data: products, error: prodError } = await supabase
-        .from('products')
-        .select('*')
-        .limit(2);
-
-    if (prodError) {
-        console.error('Error:', prodError);
-    } else {
-        console.table(products);
-        if (products && products.length > 0) {
-            console.log('Columns:', Object.keys(products[0]));
-            console.log('\nSample product:');
-            console.log(JSON.stringify(products[0], null, 2));
-        }
-    }
-
-    // 4. Check product_images structure
-    console.log('\n4. PRODUCT_IMAGES:');
-    const { data: images, error: imgError } = await supabase
-        .from('product_images')
-        .select('*')
-        .limit(3);
-
-    if (imgError) {
-        console.error('Error:', imgError);
-    } else {
-        console.table(images);
-        if (images && images.length > 0) {
-            console.log('Columns:', Object.keys(images[0]));
-        }
-    }
-
-    console.log('\n' + '='.repeat(70));
 }
 
-checkSchema().catch(console.error);
+checkSchema();

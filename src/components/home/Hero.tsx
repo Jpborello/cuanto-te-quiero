@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
-    { id: 1, src: "/images/hero-main.png", alt: "Cuanto Te Quiero - Colección Bebé" },
+    { id: 1, src: "/images/hero-logo.jpg", alt: "Cuanto Te Quiero" },
 ];
 
 export default function Hero() {
@@ -43,6 +43,17 @@ export default function Hero() {
             onMouseEnter={() => setAutoplay(false)}
             onMouseLeave={() => setAutoplay(true)}
         >
+            {/* Gradient Background */}
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, #ffc0cb 0%, #e6f3ff 50%, #add8e6 100%)',
+                zIndex: -1
+            }} />
+
             {/* Imagen del hero */}
             <AnimatePresence mode="wait">
                 <motion.div
@@ -52,62 +63,31 @@ export default function Hero() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.8 }}
                     className="hero-slide-wrapper"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '2rem',
+                        minHeight: '400px'
+                    }}
                 >
                     <Image
-                        src={slides[index].src}
+                        src="/images/hero-logo.png"
                         alt={slides[index].alt}
-                        width={1920}
-                        height={1080}
+                        width={800}
+                        height={400}
                         className="hero-image"
                         priority
                         unoptimized
-                        sizes="100vw"
+                        style={{
+                            width: '100%',
+                            maxWidth: '800px',
+                            height: 'auto',
+                            objectFit: 'contain'
+                        }}
                     />
                 </motion.div>
             </AnimatePresence>
-
-            {/* MARCA */}
-            <div className="hero-brand">
-                {/* CUANTO */}
-                <div className="hero-brand-top">
-                    <svg viewBox="0 0 500 120" width="500" height="120">
-                        <path
-                            id="curve-top"
-                            d="M 50 100 Q 250 20 450 100"
-                            fill="transparent"
-                        />
-                        <text>
-                            <textPath
-                                href="#curve-top"
-                                startOffset="50%"
-                                textAnchor="middle"
-                            >
-                                CUANTO
-                            </textPath>
-                        </text>
-                    </svg>
-                </div>
-
-                {/* TE QUIERO */}
-                <div className="hero-brand-bottom">
-                    <svg viewBox="0 0 500 160" width="500" height="160">
-                        <path
-                            id="curve-bottom"
-                            d="M 50 40 Q 250 140 450 40"
-                            fill="transparent"
-                        />
-                        <text>
-                            <textPath
-                                href="#curve-bottom"
-                                startOffset="50%"
-                                textAnchor="middle"
-                            >
-                                TE QUIERO
-                            </textPath>
-                        </text>
-                    </svg>
-                </div>
-            </div>
 
             {/* Navegación */}
             {slides.length > 1 && (

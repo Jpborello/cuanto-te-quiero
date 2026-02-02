@@ -30,7 +30,7 @@ async function setInitialFeatured() {
         // Get first 6 active products
         const { data: products, error } = await supabase
             .from('products')
-            .select('id, product_id, code, name')
+            .select('uid, product_id, code, name')
             .eq('active', true)
             .order('product_id', { ascending: true })
             .limit(6);
@@ -47,12 +47,12 @@ async function setInitialFeatured() {
         console.log(`Encontrados ${products.length} productos para marcar como destacados:\n`);
 
         // Mark them as featured
-        const productIds = products.map(p => p.id);
+        const productUids = products.map(p => p.uid);
 
         const { error: updateError } = await supabase
             .from('products')
             .update({ featured: true })
-            .in('id', productIds);
+            .in('uid', productUids);
 
         if (updateError) {
             throw updateError;
