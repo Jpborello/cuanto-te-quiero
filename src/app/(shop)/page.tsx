@@ -5,6 +5,7 @@ import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import ProductGrid from "@/components/shop/ProductGrid";
 import FeaturedCarousel from "@/components/shop/FeaturedCarousel";
+import CategoryBubbles from "@/components/shop/CategoryBubbles";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -83,19 +84,11 @@ export default function Home() {
                         <FeaturedCarousel />
                     </div>
 
-                    {/* Sección Productos */}
-                    <div className="products-container">
-                        <h3 className="section-title" style={{
-                            fontSize: '2rem',
-                            fontWeight: 'bold',
-                            textAlign: 'center',
-                            marginBottom: '2.5rem',
-                            color: '#333'
-                        }}>
-                            Lo más buscado
-                        </h3>
-                        <ProductGrid limit={4} />
-                    </div>
+                    {/* Categorías (Burbujas) */}
+                    <CategoryBubbles />
+
+
+
                 </section>
             </main>
             <Footer />

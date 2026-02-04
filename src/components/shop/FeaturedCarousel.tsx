@@ -134,20 +134,41 @@ export default function FeaturedCarousel() {
             }}>
                 {/* Imagen de fondo */}
                 {getImageUrl(currentProduct.image_url) ? (
-                    <img
-                        src={getImageUrl(currentProduct.image_url)!}
-                        alt={currentProduct.name}
-                        style={{
+                    <>
+                        <img
+                            src={getImageUrl(currentProduct.image_url)!}
+                            alt={currentProduct.name}
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                objectPosition: 'center',
+                                transition: 'all 0.5s ease'
+                            }}
+                        />
+                        {/* Watermark */}
+                        <div style={{
                             position: 'absolute',
-                            top: 0,
-                            left: 0,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%) rotate(-30deg)',
+                            fontFamily: 'var(--font-bubblegum)',
+                            color: 'rgba(255, 255, 255, 0.2)', // White transparent for hero
+                            fontSize: '6rem', // Much larger for hero
+                            textAlign: 'center',
+                            pointerEvents: 'none',
+                            lineHeight: '0.9',
+                            whiteSpace: 'nowrap',
+                            zIndex: 1,
                             width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            transition: 'all 0.5s ease'
-                        }}
-                    />
+                            textShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        }}>
+                            Cuanto te<br />Quiero
+                        </div>
+                    </>
                 ) : (
                     <div style={{
                         position: 'absolute',
@@ -330,6 +351,6 @@ export default function FeaturedCarousel() {
                     />
                 ))}
             </div>
-        </div>
+        </div >
     );
 }

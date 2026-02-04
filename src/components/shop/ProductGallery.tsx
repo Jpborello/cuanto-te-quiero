@@ -39,17 +39,13 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
             <div
                 style={{
                     width: '100%',
-                    aspectRatio: '1',
-                    backgroundColor: 'white',
+                    backgroundColor: '#fafafa', // Light gray background like grid
                     borderRadius: '16px',
                     overflow: 'hidden',
                     marginBottom: '1rem',
                     cursor: isZoomed ? 'zoom-out' : 'zoom-in',
                     position: 'relative',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '1rem'
+                    // Removed flex centering and padding to let image fill space
                 }}
                 onMouseEnter={() => setIsZoomed(true)}
                 onMouseLeave={() => setIsZoomed(false)}
@@ -58,15 +54,32 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                     src={currentImage}
                     alt={`${productName} - imagen ${selectedIndex + 1}`}
                     style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        width: 'auto',
+                        width: '100%',
                         height: 'auto',
-                        objectFit: 'contain',
+                        display: 'block',
                         transition: 'transform 0.3s ease',
                         transform: isZoomed ? 'scale(1.5)' : 'scale(1)'
                     }}
                 />
+                {/* Watermark */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%) rotate(-30deg)',
+                    fontFamily: 'var(--font-bubblegum)',
+                    color: 'rgba(120, 80, 50, 0.15)', // Brown with low opacity
+                    fontSize: '4rem', // Larger for gallery
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                    lineHeight: '0.9',
+                    whiteSpace: 'nowrap',
+                    zIndex: 10,
+                    width: '100%',
+                    userSelect: 'none'
+                }}>
+                    Cuanto te<br />Quiero
+                </div>
             </div>
 
             {/* Thumbnails */}

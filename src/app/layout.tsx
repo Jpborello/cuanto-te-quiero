@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Bubblegum_Sans } from "next/font/google"; // Import Bubblegum Sans
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+const bubblegumSans = Bubblegum_Sans({
+    weight: "400",
+    subsets: ["latin"],
+    variable: "--font-bubblegum"
+});
 
 export const metadata: Metadata = {
     title: "Cuanto Te Quiero",
@@ -16,7 +21,7 @@ export default function RootLayout({
 }) {
     return (
         <html lang="es" suppressHydrationWarning>
-            <body className={inter.className} suppressHydrationWarning>
+            <body className={`${inter.className} ${bubblegumSans.variable}`} suppressHydrationWarning>
                 {children}
             </body>
         </html>

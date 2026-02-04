@@ -43,26 +43,59 @@ export default function SubcategoryPage() {
     const fetchSubcategoryAndProducts = async () => {
         try {
             console.log('[DEBUG] Starting fetchSubcategoryAndProducts');
+            console.log('[DEBUG] slug:', slug);
             console.log('[DEBUG] subslug:', subslug);
 
-            // Convertir subslug a nombre de subcategoría
-            const subcategoryName = subslug
-                .split('-')
-                .map(word => word.toUpperCase())
-                .join(' ');
+            // 1. Helper to generate slug (must match Header logic)
+            const getSlug = (name: string) => {
+                return name.toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[áàäâ]/g, 'a')
+                    .replace(/[éèëê]/g, 'e')
+                    .replace(/[íìïî]/g, 'i')
+                    .replace(/[óòöô]/g, 'o')
+                    .replace(/[úùüû]/g, 'u')
+                    .replace(/ñ/g, 'n');
+            };
 
-            console.log('[DEBUG] Converted subcategoryName:', subcategoryName);
+            // 2. Fetch Category first to get ID (and ensure hierarchy)
+            // Reconstruct category name from slug (this usually works better for simple names, 
+            // OR ideally we should just list categories and match slug like we do for subcategory)
+            // But let's assume category name reconstruction is "safe enough" OR fetch all categories.
+            // Let's fetch all categories to be safe.
+            const { data: allCategories, error: catError } = await supabase
+                .from("categories")
+                .select("*");
 
-            // Buscar subcategoría con match exacto
-            const { data: subcategoryData, error: subcategoryError } = await supabase
+            if (catError) throw catError;
+
+            // Find matching category
+            const categoryData = allCategories.find(c => getSlug(c.name) === slug);
+
+            if (!categoryData) {
+                console.error("Category not found for slug:", slug);
+                throw new Error("Category not found");
+            }
+
+            // 3. Fetch all subcategories for this category
+            const { data: allSubcats, error: subError } = await supabase
                 .from("subcategories")
                 .select("*")
-                .eq("name", subcategoryName)
-                .single();
+                .eq("category_id", categoryData.id);
 
-            console.log('[DEBUG] Subcategory query result:', { subcategoryData, subcategoryError });
+            if (subError) throw subError;
 
-            if (subcategoryError) throw subcategoryError;
+            // 4. Find matching subcategory by slug
+            const subcategoryData = allSubcats.find(s => getSlug(s.name) === subslug);
+
+            if (!subcategoryData) {
+                console.error("Subcategory not found for subslug:", subslug);
+                // Fallback: try direct name match if slug fails (legacy behavior expectation?)
+                // Or just throw.
+                throw new Error("Subcategory not found");
+            }
+
+            console.log('[DEBUG] Found subcategory:', subcategoryData);
             setSubcategory(subcategoryData);
 
             console.log('[DEBUG] Found subcategory:', subcategoryData);
@@ -211,7 +244,10 @@ export default function SubcategoryPage() {
                                             overflow: 'hidden',
                                             boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                             transition: 'all 0.3s ease',
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            height: '100%', // Enforce full height
+                                            display: 'flex', // Enable flex layout
+                                            flexDirection: 'column' // Stack children vertically
                                         }}
                                         onMouseOver={(e) => {
                                             e.currentTarget.style.transform = 'translateY(-4px)';
@@ -225,26 +261,43 @@ export default function SubcategoryPage() {
                                         {/* Image */}
                                         <div style={{
                                             width: '100%',
-                                            height: '280px',
-                                            backgroundColor: 'white',
+                                            backgroundColor: '#fafafa',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             overflow: 'hidden',
-                                            padding: '0.5rem'
+                                            position: 'relative' // Needed for absolute positioning
                                         }}>
                                             {product.images && product.images.length > 0 ? (
-                                                <img
-                                                    src={product.images[0]}
-                                                    alt={product.name}
-                                                    style={{
-                                                        maxWidth: '100%',
-                                                        maxHeight: '100%',
-                                                        width: 'auto',
-                                                        height: 'auto',
-                                                        objectFit: 'contain'
-                                                    }}
-                                                />
+                                                <>
+                                                    <img
+                                                        src={product.images[0]}
+                                                        alt={product.name}
+                                                        style={{
+                                                            width: '100%',
+                                                            height: 'auto',
+                                                            display: 'block'
+                                                        }}
+                                                    />
+                                                    {/* Watermark */}
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        transform: 'translate(-50%, -50%) rotate(-30deg)',
+                                                        fontFamily: 'var(--font-bubblegum)',
+                                                        color: 'rgba(120, 80, 50, 0.15)', // Brown with low opacity
+                                                        fontSize: '2.5rem',
+                                                        textAlign: 'center',
+                                                        pointerEvents: 'none',
+                                                        lineHeight: '0.9',
+                                                        whiteSpace: 'nowrap',
+                                                        zIndex: 10,
+                                                        width: '100%'
+                                                    }}>
+                                                        Cuanto te<br />Quiero
+                                                    </div>
+                                                </>
                                             ) : (
                                                 <div style={{ color: '#ccc', fontSize: '4rem' }}>
                                                     📦
@@ -253,9 +306,15 @@ export default function SubcategoryPage() {
                                         </div>
 
                                         {/* Content */}
-                                        <div style={{ padding: '1.5rem' }}>
+                                        <div style={{
+                                            padding: '1rem',
+                                            flexGrow: 1,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            justifyContent: 'space-between'
+                                        }}>
                                             <h3 style={{
-                                                fontSize: '1.125rem',
+                                                fontSize: '1rem',
                                                 fontWeight: '600',
                                                 color: '#333',
                                                 marginBottom: '0.5rem',
@@ -265,19 +324,6 @@ export default function SubcategoryPage() {
                                             }}>
                                                 {product.name}
                                             </h3>
-
-                                            <p style={{
-                                                fontSize: '0.875rem',
-                                                color: '#666',
-                                                marginBottom: '1rem',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical'
-                                            }}>
-                                                {product.description}
-                                            </p>
 
                                             {/* Price and Stock */}
                                             <div style={{

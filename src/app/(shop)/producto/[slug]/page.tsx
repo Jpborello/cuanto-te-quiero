@@ -418,18 +418,40 @@ export default function ProductDetailPage() {
                                                 backgroundColor: '#f5f5f5',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'center'
+                                                justifyContent: 'center',
+                                                position: 'relative', // Needed for watermark
+                                                overflow: 'hidden'
                                             }}>
                                                 {relatedProduct.images && relatedProduct.images.length > 0 ? (
-                                                    <img
-                                                        src={relatedProduct.images[0]}
-                                                        alt={relatedProduct.name}
-                                                        style={{
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            objectFit: 'cover'
-                                                        }}
-                                                    />
+                                                    <>
+                                                        <img
+                                                            src={relatedProduct.images[0]}
+                                                            alt={relatedProduct.name}
+                                                            style={{
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                objectFit: 'cover'
+                                                            }}
+                                                        />
+                                                        {/* Watermark */}
+                                                        <div style={{
+                                                            position: 'absolute',
+                                                            top: '50%',
+                                                            left: '50%',
+                                                            transform: 'translate(-50%, -50%) rotate(-30deg)',
+                                                            fontFamily: 'var(--font-bubblegum)',
+                                                            color: 'rgba(120, 80, 50, 0.15)', // Brown with low opacity
+                                                            fontSize: '2rem', // Slightly smaller for related products
+                                                            textAlign: 'center',
+                                                            pointerEvents: 'none',
+                                                            lineHeight: '0.9',
+                                                            whiteSpace: 'nowrap',
+                                                            zIndex: 10,
+                                                            width: '100%'
+                                                        }}>
+                                                            Cuanto te<br />Quiero
+                                                        </div>
+                                                    </>
                                                 ) : (
                                                     <Package size={60} style={{ color: '#ccc' }} />
                                                 )}

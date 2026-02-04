@@ -114,7 +114,10 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                         overflow: 'hidden',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         transition: 'all 0.3s ease',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        height: '100%', // Enforce full height
+                        display: 'flex', // Enable flex layout
+                        flexDirection: 'column' // Stack children vertically
                     }}
                     onMouseOver={(e) => {
                         e.currentTarget.style.transform = 'translateY(-4px)';
@@ -128,26 +131,43 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                     {/* Image */}
                     <div style={{
                         width: '100%',
-                        height: '280px',
-                        backgroundColor: 'white',
+                        backgroundColor: '#fafafa',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         overflow: 'hidden',
-                        padding: '0.5rem'
+                        position: 'relative' // Needed for absolute positioning of watermark
                     }}>
                         {getImageUrl(product.image_url) ? (
-                            <img
-                                src={getImageUrl(product.image_url)!}
-                                alt={product.name}
-                                style={{
-                                    maxWidth: '100%',
-                                    maxHeight: '100%',
-                                    width: 'auto',
-                                    height: 'auto',
-                                    objectFit: 'contain'
-                                }}
-                            />
+                            <>
+                                <img
+                                    src={getImageUrl(product.image_url)!}
+                                    alt={product.name}
+                                    style={{
+                                        width: '100%',
+                                        height: 'auto',
+                                        display: 'block'
+                                    }}
+                                />
+                                {/* Watermark */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%) rotate(-30deg)',
+                                    fontFamily: 'var(--font-bubblegum)',
+                                    color: 'rgba(120, 80, 50, 0.15)', // Brown with low opacity
+                                    fontSize: '2.5rem',
+                                    textAlign: 'center',
+                                    pointerEvents: 'none',
+                                    lineHeight: '0.9',
+                                    whiteSpace: 'nowrap',
+                                    zIndex: 10,
+                                    width: '100%'
+                                }}>
+                                    Cuanto te<br />Quiero
+                                </div>
+                            </>
                         ) : (
                             <div style={{
                                 color: '#ccc',
@@ -160,10 +180,14 @@ export default function ProductGrid({ limit }: ProductGridProps) {
 
                     {/* Content */}
                     <div style={{
-                        padding: '1.5rem'
+                        padding: '1rem',
+                        flexGrow: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
                     }}>
                         <h3 style={{
-                            fontSize: '1.125rem',
+                            fontSize: '1rem',
                             fontWeight: '600',
                             color: '#333',
                             marginBottom: '0.5rem',
@@ -173,19 +197,6 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                         }}>
                             {product.name}
                         </h3>
-
-                        <p style={{
-                            fontSize: '0.875rem',
-                            color: '#666',
-                            marginBottom: '1rem',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical'
-                        }}>
-                            {product.description}
-                        </p>
 
                         {/* Price and Stock */}
                         <div style={{

@@ -115,7 +115,45 @@ export default function CategoryPage() {
                 })
             );
 
-            setSubcategories(subcategoriesWithImages);
+
+            // Define custom order for Muebles Infantiles
+            const customOrder = [
+                "CUNAS",
+                "CUNAS COLECHO",
+                "CUNAS FUNCIONALES", // Assuming this might exist or user wants it
+                "CAJONERAS",
+                "ROPEROS Y PLACARES",
+                "MONTESSORI",
+                "CAMAS DE 1 PLAZA Y NIDO",
+                "CUCHETAS - RINCONERAS - PUENTE",
+                "ESCRITORIOS"
+            ];
+
+            // Sort subcategories based on custom order
+            const sortedSubcategories = subcategoriesWithImages.sort((a, b) => {
+                // Normalize names for comparison (remove extra spaces, uppercase)
+                const nameA = a.name.trim().toUpperCase();
+                const nameB = b.name.trim().toUpperCase();
+
+                const indexA = customOrder.indexOf(nameA);
+                const indexB = customOrder.indexOf(nameB);
+
+                // If both are in the list, sort by index
+                if (indexA !== -1 && indexB !== -1) {
+                    return indexA - indexB;
+                }
+
+                // If only A is in list, it comes first
+                if (indexA !== -1) return -1;
+
+                // If only B is in list, it comes first
+                if (indexB !== -1) return 1;
+
+                // If neither, sort alphabetically
+                return nameA.localeCompare(nameB);
+            });
+
+            setSubcategories(sortedSubcategories);
         } catch (error) {
             console.error("Error fetching category:", error);
         } finally {
