@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
-    { id: 1, src: "/images/hero-logo.jpg", alt: "Cuanto Te Quiero" },
+    { id: 1, src: "/images/IMG-Hero.png", alt: "Cuanto Te Quiero" },
 ];
 
 export default function Hero() {
@@ -72,10 +72,11 @@ export default function Hero() {
                     }}
                 >
                     <Image
-                        src="/images/hero-logo.png"
+                        src="/images/IMG-Hero.png"
                         alt={slides[index].alt}
-                        width={800}
-                        height={400}
+                        width={0}
+                        height={0}
+                        sizes="100vw"
                         className="hero-image"
                         priority
                         unoptimized

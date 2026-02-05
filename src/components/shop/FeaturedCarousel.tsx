@@ -118,46 +118,26 @@ export default function FeaturedCarousel() {
     const currentProduct = products[currentIndex];
 
     return (
-        <div style={{
-            position: 'relative',
-            height: '500px',
-            borderRadius: '24px',
-            overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-        }}>
+        <div className="featured-carousel">
             {/* Producto Principal */}
-            <div style={{
-                position: 'relative',
-                height: '100%',
-                backgroundColor: 'white',
-                overflow: 'hidden'
-            }}>
+            <div className="featured-carousel-image-container">
                 {/* Imagen de fondo */}
                 {getImageUrl(currentProduct.image_url) ? (
                     <>
                         <img
                             src={getImageUrl(currentProduct.image_url)!}
                             alt={currentProduct.name}
-                            style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                objectPosition: 'center',
-                                transition: 'all 0.5s ease'
-                            }}
+                            className="featured-carousel-image"
                         />
-                        {/* Watermark */}
+                        {/* Watermark in Image Container - Only visible if image exists */}
                         <div style={{
                             position: 'absolute',
                             top: '50%',
                             left: '50%',
                             transform: 'translate(-50%, -50%) rotate(-30deg)',
                             fontFamily: 'var(--font-bubblegum)',
-                            color: 'rgba(255, 255, 255, 0.2)', // White transparent for hero
-                            fontSize: '6rem', // Much larger for hero
+                            color: 'rgba(255, 255, 255, 0.2)',
+                            fontSize: '6rem',
                             textAlign: 'center',
                             pointerEvents: 'none',
                             lineHeight: '0.9',
@@ -171,93 +151,33 @@ export default function FeaturedCarousel() {
                     </>
                 ) : (
                     <div style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
                         width: '100%',
                         height: '100%',
                         background: 'linear-gradient(135deg, #ffc0cb 0%, #add8e6 100%)'
                     }} />
                 )}
-
-                {/* Overlay */}
-                <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, transparent 100%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    padding: '4rem'
-                }}>
-                    <span style={{
-                        display: 'inline-block',
-                        padding: '0.5rem 1.25rem',
-                        backgroundColor: '#ff6b9d',
-                        color: 'white',
-                        fontSize: '0.875rem',
-                        fontWeight: '600',
-                        borderRadius: '20px',
-                        marginBottom: '1.5rem',
-                        width: 'fit-content',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px'
-                    }}>
-                        ✨ Producto Destacado
-                    </span>
-
-                    <h2 style={{
-                        fontSize: '3rem',
-                        fontWeight: 'bold',
-                        color: 'white',
-                        marginBottom: '1rem',
-                        lineHeight: '1.2',
-                        maxWidth: '600px',
-                        textShadow: '0 2px 8px rgba(0,0,0,0.3)'
-                    }}>
-                        {currentProduct.name}
-                    </h2>
-
-                    <p style={{
-                        fontSize: '2.5rem',
-                        fontWeight: 'bold',
-                        color: '#ffc0cb',
-                        marginBottom: '2rem',
-                        textShadow: '0 2px 8px rgba(0,0,0,0.5)'
-                    }}>
-                        ${currentProduct.price.toLocaleString('es-AR')}
-                    </p>
-
-                    <Link href={`/producto/${currentProduct.product_id}`} style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '1rem 2.5rem',
-                        backgroundColor: '#ffc0cb',
-                        color: 'white',
-                        textDecoration: 'none',
-                        borderRadius: '50px',
-                        fontSize: '1.125rem',
-                        fontWeight: '600',
-                        boxShadow: '0 4px 12px rgba(255,192,203,0.4)',
-                        transition: 'all 0.3s ease',
-                        width: 'fit-content'
-                    }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.backgroundColor = '#ff6b9d';
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(255,107,157,0.5)';
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.backgroundColor = '#ffc0cb';
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,192,203,0.4)';
-                        }}>
-                        <ShoppingCart size={20} />
-                        Ver Producto
-                    </Link>
-                </div>
             </div>
+
+            {/* Content Section */}
+            <div className="featured-carousel-content">
+                <span className="featured-tag">
+                    ✨ Producto Destacado
+                </span>
+
+                <h2 className="featured-title">
+                    {currentProduct.name}
+                </h2>
+
+                <p className="featured-price">
+                    ${currentProduct.price.toLocaleString('es-AR')}
+                </p>
+
+                <Link href={`/producto/${currentProduct.product_id}`} className="featured-button">
+                    <ShoppingCart size={20} />
+                    Ver Producto
+                </Link>
+            </div>
+
 
             {/* Controles de Navegación */}
             <button
