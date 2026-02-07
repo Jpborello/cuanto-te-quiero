@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 interface Product {
     uid: string;
     product_id: number;
+    code: string;
     name: string;
     price: number;
     image_url: string | string[] | null;
@@ -115,7 +116,26 @@ export default function FeaturedCarousel() {
         return null;
     }
 
+    // Helper function to get short product name (before numbers/special chars)
+    const getShortProductName = (name: string): string => {
+        // Extract main product name before numbers, dimensions, or special details
+        // Examples: "CUNA BARANDA FIJA 1.30 X 70 C/RUEDAS ROSA" -> "CUNA BARANDA FIJA"
+        //           "CUNA CON BARANDA DESLIZABLE Y CAJONES NORDIC" -> "CUNA CON BARANDA"
+
+        // Split by common separators and take meaningful first parts
+        const parts = name.split(/[\d\/\(]/)[0].trim(); // Split before numbers, /, or (
+
+        // If still too long, take first 3-4 words
+        const words = parts.split(' ');
+        if (words.length > 4) {
+            return words.slice(0, 4).join(' ');
+        }
+
+        return parts;
+    };
+
     const currentProduct = products[currentIndex];
+    const shortName = getShortProductName(currentProduct.name);
 
     return (
         <div className="featured-carousel">
@@ -153,7 +173,8 @@ export default function FeaturedCarousel() {
                     <div style={{
                         width: '100%',
                         height: '100%',
-                        background: 'linear-gradient(135deg, #ffc0cb 0%, #add8e6 100%)'
+                        /* Dark gradient overlay for better text readability */
+                        background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.3) 70%, rgba(0, 0, 0, 0.1) 100%)'
                     }} />
                 )}
             </div>
@@ -165,16 +186,27 @@ export default function FeaturedCarousel() {
                 </span>
 
                 <h2 className="featured-title">
-                    {currentProduct.name}
+                    {shortName}
                 </h2>
 
-                <p className="featured-price">
-                    ${currentProduct.price.toLocaleString('es-AR')}
-                </p>
+                {currentProduct.price > 0 ? (
+                    <p className="featured-price">
+                        ${currentProduct.price.toLocaleString('es-AR')}
+                    </p>
+                ) : (
+                    <p className="featured-price" style={{
+                        background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                    }}>
+                        Consultar precio
+                    </p>
+                )}
 
-                <Link href={`/producto/${currentProduct.product_id}`} className="featured-button">
-                    <ShoppingCart size={20} />
-                    Ver Producto
+                <Link href={`/producto/${currentProduct.code}`} className="featured-button">
+                    <ShoppingCart size={22} />
+                    Ver Detalles
                 </Link>
             </div>
 
@@ -184,64 +216,74 @@ export default function FeaturedCarousel() {
                 onClick={prevSlide}
                 style={{
                     position: 'absolute',
-                    left: '1rem',
+                    left: '2rem',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    background: 'rgba(255,255,255,0.9)',
+                    background: 'rgba(255,255,255,0.95)',
                     border: 'none',
                     borderRadius: '50%',
-                    width: '50px',
-                    height: '50px',
+                    width: '56px',
+                    height: '56px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    transition: 'all 0.2s ease',
-                    zIndex: 10
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                    transition: 'all 0.3s ease',
+                    zIndex: 10,
+                    backdropFilter: 'blur(8px)'
                 }}
                 onMouseOver={(e) => {
-                    e.currentTarget.style.background = '#ffc0cb';
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #ff6b9d 0%, #ffc0cb 100%)';
                     e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                    e.currentTarget.style.boxShadow = '0 6px 24px rgba(255,107,157,0.4)';
                 }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.9)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.95)';
                     e.currentTarget.style.color = '#333';
+                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)';
                 }}
             >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={26} />
             </button>
 
             <button
                 onClick={nextSlide}
                 style={{
                     position: 'absolute',
-                    right: '1rem',
+                    right: '2rem',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    background: 'rgba(255,255,255,0.9)',
+                    background: 'rgba(255,255,255,0.95)',
                     border: 'none',
                     borderRadius: '50%',
-                    width: '50px',
-                    height: '50px',
+                    width: '56px',
+                    height: '56px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    transition: 'all 0.2s ease',
-                    zIndex: 10
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+                    transition: 'all 0.3s ease',
+                    zIndex: 10,
+                    backdropFilter: 'blur(8px)'
                 }}
                 onMouseOver={(e) => {
-                    e.currentTarget.style.background = '#ffc0cb';
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #ff6b9d 0%, #ffc0cb 100%)';
                     e.currentTarget.style.color = 'white';
+                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                    e.currentTarget.style.boxShadow = '0 6px 24px rgba(255,107,157,0.4)';
                 }}
                 onMouseOut={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.9)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.95)';
                     e.currentTarget.style.color = '#333';
+                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.2)';
                 }}
             >
-                <ChevronRight size={24} />
+                <ChevronRight size={26} />
             </button>
 
             {/* Indicadores */}

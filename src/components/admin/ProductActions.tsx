@@ -65,7 +65,7 @@ export default function ProductActions({ product }: { product: any }) {
             >
                 <Power size={18} />
             </button>
-            <Link href={`/admin/products/${product.uid}`} className="action-btn edit">
+            <Link href={`/admin/products/${product.product_id}`} className="action-btn edit">
                 <Pencil size={18} />
             </Link>
         </div>

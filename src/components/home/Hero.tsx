@@ -1,127 +1,98 @@
 "use client";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const slides = [
-    { id: 1, src: "/images/IMG-Hero.png", alt: "Cuanto Te Quiero" },
-];
+import { Heart } from "lucide-react";
 
 export default function Hero() {
-    const [index, setIndex] = useState(0);
-    const [autoplay, setAutoplay] = useState(true);
+    const [scrollY, setScrollY] = useState(0);
+    const { scrollYProgress } = useScroll();
 
+    // Detectar scroll para animaciones
     useEffect(() => {
-        if (!autoplay) return;
+        const handleScroll = () => setScrollY(window.scrollY);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-        const interval = setInterval(() => {
-            setIndex((prev) => (prev + 1) % slides.length);
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, [autoplay]);
-
-    const goToPrevious = () => {
-        setIndex((prev) => (prev - 1 + slides.length) % slides.length);
-        setAutoplay(false);
-    };
-
-    const goToNext = () => {
-        setIndex((prev) => (prev + 1) % slides.length);
-        setAutoplay(false);
-    };
-
-    const goToSlide = (slideIndex: number) => {
-        setIndex(slideIndex);
-        setAutoplay(false);
-    };
+    // Animaciones basadas en scroll
+    const contentOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
+    const contentScale = useTransform(scrollYProgress, [0, 0.15], [1, 0.97]);
 
     return (
-        <div
-            className="hero-container"
-            onMouseEnter={() => setAutoplay(false)}
-            onMouseLeave={() => setAutoplay(true)}
-        >
-            {/* Gradient Background */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, #ffc0cb 0%, #e6f3ff 50%, #add8e6 100%)',
-                zIndex: -1
-            }} />
+        <div className="hero-container">
+            {/* Background - Placeholder gradient (reemplazar con imagen real) */}
+            <div className="hero-background">
+                <Image
+                    src="/images/hero_baby_sleeping_1770473809802.png"
+                    alt="Bebé durmiendo en cuna"
+                    fill
+                    style={{ objectFit: 'cover', objectPosition: 'center 60%' }}
+                    priority
+                />
 
-            {/* Imagen del hero */}
-            <AnimatePresence mode="wait">
+                {/* Overlay sutil para mejor legibilidad - Ajustado para la imagen */}
+                <div className="hero-overlay" style={{
+                    background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.45) 100%)',
+                    backdropFilter: 'blur(0px)'
+                }} />
+            </div>
+
+            {/* Contenido con animación de scroll */}
+            <motion.div
+                className="hero-content"
+                style={{
+                    opacity: contentOpacity,
+                    scale: contentScale,
+                }}
+            >
+                {/* Logo de Marca */}
                 <motion.div
-                    key={index}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="hero-slide-wrapper"
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '2rem',
-                        minHeight: '400px'
-                    }}
+                    className="hero-logo-container"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8, delay: 0.4 }}
                 >
                     <Image
                         src="/images/IMG-Hero.png"
-                        alt={slides[index].alt}
-                        width={0}
-                        height={0}
-                        sizes="100vw"
-                        className="hero-image"
+                        alt="Cuanto Te Quiero"
+                        width={350}
+                        height={200}
                         priority
-                        unoptimized
                         style={{
                             width: '100%',
-                            maxWidth: '800px',
                             height: 'auto',
-                            objectFit: 'contain'
+                            maxWidth: '350px',
+                            filter: 'drop-shadow(0 4px 20px rgba(141, 110, 99, 0.15))'
                         }}
                     />
                 </motion.div>
-            </AnimatePresence>
 
-            {/* Navegación */}
-            {slides.length > 1 && (
-                <>
-                    <button
-                        onClick={goToPrevious}
-                        className="hero-nav-button prev"
-                        aria-label="Anterior"
-                    >
-                        <ChevronLeft size={24} />
-                    </button>
+                {/* Subtitle */}
+                <motion.p
+                    className="hero-subtitle"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                >
+                    Creamos espacios llenos de amor, seguridad y ternura para los primeros años de tu pequeño
+                </motion.p>
 
-                    <button
-                        onClick={goToNext}
-                        className="hero-nav-button next"
-                        aria-label="Siguiente"
-                    >
-                        <ChevronRight size={24} />
-                    </button>
-
-                    <div className="hero-dots-container">
-                        {slides.map((_, slideIndex) => (
-                            <motion.button
-                                key={slideIndex}
-                                onClick={() => goToSlide(slideIndex)}
-                                className={`hero-dot ${slideIndex === index ? "active" : "inactive"
-                                    }`}
-                                aria-label={`Ir a slide ${slideIndex + 1}`}
-                            />
-                        ))}
-                    </div>
-                </>
-            )}
+                {/* CTA Button */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.8 }}
+                >
+                    <a href="#productos" className="hero-cta" onClick={(e) => {
+                        e.preventDefault();
+                        document.querySelector('.products-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }}>
+                        <Heart size={20} fill="currentColor" />
+                        Descubre nuestra colección
+                    </a>
+                </motion.div>
+            </motion.div>
         </div>
     );
 }

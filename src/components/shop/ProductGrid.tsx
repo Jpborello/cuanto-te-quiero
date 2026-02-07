@@ -193,7 +193,11 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                             marginBottom: '0.5rem',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            minHeight: '2.5rem',
+                            lineHeight: '1.25rem'
                         }}>
                             {product.name}
                         </h3>
@@ -206,20 +210,41 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                             marginBottom: '1rem'
                         }}>
                             <div>
-                                <span style={{
-                                    fontSize: '1.5rem',
-                                    fontWeight: 'bold',
-                                    color: '#ffc0cb'
-                                }}>
-                                    ${product.price.toLocaleString()}
-                                </span>
+                                {product.price > 0 ? (
+                                    <span style={{
+                                        fontSize: '1.5rem',
+                                        fontWeight: '800',
+                                        background: 'linear-gradient(135deg, #ffc0cb 0%, #ff6b9d 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        backgroundClip: 'text'
+                                    }}>
+                                        ${product.price.toLocaleString('es-AR')}
+                                    </span>
+                                ) : (
+                                    <span style={{
+                                        fontSize: '1.125rem',
+                                        fontWeight: '700',
+                                        background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        backgroundClip: 'text'
+                                    }}>
+                                        Consultar precio
+                                    </span>
+                                )}
                             </div>
                             <div style={{
                                 fontSize: '0.75rem',
-                                color: product.stock > 0 ? '#4caf50' : '#f44336',
-                                fontWeight: '500'
+                                color: 'white',
+                                backgroundColor: product.stock > 0 ? '#4caf50' : '#f44336',
+                                fontWeight: '600',
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '12px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
                             }}>
-                                {product.stock > 0 ? `Stock: ${product.stock}` : 'Sin stock'}
+                                {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
                             </div>
                         </div>
 
@@ -227,30 +252,45 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                         <button
                             style={{
                                 width: '100%',
-                                padding: '0.75rem',
-                                backgroundColor: '#ffc0cb',
-                                color: 'white',
+                                padding: '0.875rem',
+                                background: product.stock > 0
+                                    ? 'linear-gradient(135deg, #ff6b9d 0%, #ffc0cb 100%)'
+                                    : '#e0e0e0',
+                                color: product.stock > 0 ? 'white' : '#999',
                                 border: 'none',
-                                borderRadius: '8px',
+                                borderRadius: '12px',
                                 fontSize: '0.875rem',
-                                fontWeight: '600',
-                                cursor: 'pointer',
+                                fontWeight: '700',
+                                cursor: product.stock > 0 ? 'pointer' : 'not-allowed',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '0.5rem',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.3s ease',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px',
+                                boxShadow: product.stock > 0
+                                    ? '0 4px 12px rgba(255,107,157,0.3)'
+                                    : 'none'
                             }}
                             onMouseOver={(e) => {
-                                e.currentTarget.style.backgroundColor = '#ff6b9d';
+                                if (product.stock > 0) {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, #ff4081 0%, #ff6b9d 100%)';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(255,107,157,0.4)';
+                                }
                             }}
                             onMouseOut={(e) => {
-                                e.currentTarget.style.backgroundColor = '#ffc0cb';
+                                if (product.stock > 0) {
+                                    e.currentTarget.style.background = 'linear-gradient(135deg, #ff6b9d 0%, #ffc0cb 100%)';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(255,107,157,0.3)';
+                                }
                             }}
                             disabled={product.stock === 0}
                         >
-                            <ShoppingCart size={16} />
-                            {product.stock > 0 ? 'Agregar al carrito' : 'Sin stock'}
+                            <ShoppingCart size={18} />
+                            {product.stock > 0 ? 'Agregar' : 'Agotado'}
                         </button>
                     </div>
                 </div>

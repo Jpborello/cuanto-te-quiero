@@ -14,27 +14,39 @@ export default async function EditProductPage({ params }: PageProps) {
 
     const supabase = await createClient();
 
-    // Fetch product, images, categories, and subcategories in parallel
-    const [
-        { data: product, error: productError },
-        { data: productImages },
-        { data: categories },
-        { data: subcategories }
-    ] = await Promise.all([
-        supabase.from("products").select("*").eq("id", id).single(),
-        supabase.from("product_images").select("image_url").eq("product_id", id),
-        supabase.from("categories").select("*").order("name"),
-        supabase.from("subcategories").select("*").order("name")
-    ]);
+    // Fetch product first to get its uid
+    const { data: product, error: productError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("product_id", id)
+        .single();
 
     if (productError || !product) {
         return notFound();
     }
 
+    // Now fetch images, categories, and subcategories in parallel using the product's uid
+    const [
+        { data: productImages },
+        { data: categories },
+        { data: subcategories }
+    ] = await Promise.all([
+        supabase.from("product_images").select("image_url").eq("product_id", product.uid),
+        supabase.from("categories").select("*").order("name"),
+        supabase.from("subcategories").select("*").order("name")
+    ]);
+
     // Merge product images into the product object for the form
+    // Fallback: if product_images is empty but product has image_url, use that
+    let imagesToShow = productImages || [];
+    if (imagesToShow.length === 0 && product.image_url) {
+        // Convert single image_url to product_images format
+        imagesToShow = [{ image_url: product.image_url }];
+    }
+
     const productWithImages = {
         ...product,
-        product_images: productImages || []
+        product_images: imagesToShow
     };
 
     return (

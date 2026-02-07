@@ -150,13 +150,15 @@ export default function ProductForm({ initialData, categories, subcategories }: 
 
             // Insert new images
             if (images.length > 0) {
-                const imageInserts = images.map(url => ({
+                const imageInserts = images.map((url, index) => ({
                     product_id: productUid, // Use uid for foreign key
-                    image_url: url
+                    image_url: url, // Ensure this is a string
+                    display_order: index // Optional: track image order
                 }));
                 const { error: imgError } = await supabase.from("product_images").insert(imageInserts);
                 if (imgError) {
-                    console.warn("Could not insert into product_images (table might not exist or schema mismatch). Ignoring as we saved primary image to products table.");
+                    console.error("Error inserting product images:", imgError);
+                    throw new Error(`Error al guardar imágenes: ${imgError.message}`);
                 }
             }
 
