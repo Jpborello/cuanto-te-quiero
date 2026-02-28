@@ -99,9 +99,9 @@ export default function ProductForm({ initialData, categories, subcategories }: 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validation for 4-digit ID
-        if (!/^\d{4}$/.test(formData.custom_id.toString())) {
-            alert("El ID del producto debe ser de 4 dígitos exactos.");
+        // Validation for alphanumeric ID
+        if (!/^[A-Za-z0-9_-]+$/.test(formData.custom_id.toString().trim())) {
+            alert("El ID del producto debe contener solo letras, números y guiones (sin espacios).");
             return;
         }
 
@@ -109,7 +109,7 @@ export default function ProductForm({ initialData, categories, subcategories }: 
 
         try {
             const productPayload = {
-                product_id: parseInt(formData.custom_id), // Internal ID for management
+                product_id: formData.custom_id.toString().trim(), // Internal alphanumeric ID
                 name: formData.name,
                 description: formData.description,
                 category_id: formData.category_id || null,
@@ -172,17 +172,16 @@ export default function ProductForm({ initialData, categories, subcategories }: 
                         </div>
 
                         <div className="field-group">
-                            <label className="form-label form-label-required">ID Producto (Manual)</label>
+                            <label className="form-label form-label-required">ID Producto (Interno)</label>
                             <input
-                                type="number"
+                                type="text"
                                 required
-                                className="form-input font-mono font-bold text-lg w-full md:w-48"
-                                placeholder="0001"
+                                className="form-input font-mono font-bold text-lg w-full md:w-48 uppercase"
+                                placeholder="Ej: N136"
                                 value={formData.custom_id}
-                                onChange={(e) => setFormData({ ...formData, custom_id: e.target.value })}
-                                disabled={!!initialData}
+                                onChange={(e) => setFormData({ ...formData, custom_id: e.target.value.toUpperCase() })}
                             />
-                            <p className="form-hint">4 dígitos exactos</p>
+                            <p className="form-hint">Letras, números y guiones</p>
                         </div>
                     </div>
 
