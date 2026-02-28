@@ -23,6 +23,11 @@ interface CategoryManagerProps {
     initialSubcategories: Subcategory[];
 }
 
+// Helper para capitalizar (ej: MUEBLES INFANTILES -> Muebles Infantiles)
+const capitalizeWords = (str: string) => {
+    return str.toLowerCase().replace(/(?:^|\s)\S/g, function (a) { return a.toUpperCase(); });
+};
+
 export default function CategoryManager({ initialCategories, initialSubcategories }: CategoryManagerProps) {
     const router = useRouter();
     const [categories, setCategories] = useState<Category[]>(initialCategories);
@@ -207,27 +212,78 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
 
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
-                                        <h3 className={`font-semibold text-lg ${!cat.active && 'text-gray-500 line-through decoration-gray-400'}`}>
-                                            {cat.name}
+                                        <h3 style={{
+                                            fontWeight: 'bold',
+                                            fontSize: '19px',
+                                            letterSpacing: '-0.025em',
+                                            color: cat.active ? '#1e293b' : '#94a3b8',
+                                            textDecoration: cat.active ? 'none' : 'line-through'
+                                        }}>
+                                            {capitalizeWords(cat.name)}
                                         </h3>
-                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${cat.active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                        <span style={{
+                                            fontSize: '10px',
+                                            padding: '2px 8px',
+                                            borderRadius: '9999px',
+                                            fontWeight: 'bold',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            backgroundColor: cat.active ? '#dcfce7' : '#f1f5f9',
+                                            color: cat.active ? '#15803d' : '#475569'
+                                        }}>
                                             {cat.active ? 'Activa' : 'Inactiva'}
                                         </span>
                                     </div>
                                     <p className="text-xs text-gray-400 mt-0.5">{catSubs.length} subcategorías</p>
                                 </div>
 
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2 mr-2">
                                     <button
                                         onClick={() => setCreatingSubFor(cat.id)}
-                                        className="p-2 text-[var(--admin-accent)] hover:bg-indigo-50 rounded-lg text-sm font-medium flex items-center gap-1 transition-colors"
+                                        style={{
+                                            padding: '6px 12px',
+                                            color: '#4f46e5',
+                                            backgroundColor: '#eef2ff',
+                                            border: '1px solid #e0e7ff',
+                                            borderRadius: '8px',
+                                            fontSize: '14px',
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                        onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#e0e7ff'; e.currentTarget.style.color = '#4338ca'; }}
+                                        onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#eef2ff'; e.currentTarget.style.color = '#4f46e5'; }}
+                                        title="Agregar Subcategoría"
                                     >
                                         <Plus size={16} />
                                         <span className="hidden sm:inline">Subcategoría</span>
                                     </button>
                                     <button
                                         onClick={() => toggleCategoryStatus(cat)}
-                                        className={`p-2 rounded-lg transition-colors ${cat.active ? 'text-gray-400 hover:text-red-500 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}`}
+                                        style={{
+                                            padding: '8px',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            color: cat.active ? '#94a3b8' : '#059669',
+                                            backgroundColor: cat.active ? 'transparent' : '#ecfdf5',
+                                            border: 'none'
+                                        }}
+                                        onMouseOver={(e) => {
+                                            if (cat.active) {
+                                                e.currentTarget.style.color = '#dc2626';
+                                                e.currentTarget.style.backgroundColor = '#fef2f2';
+                                            } else {
+                                                e.currentTarget.style.backgroundColor = '#d1fae5';
+                                            }
+                                        }}
+                                        onMouseOut={(e) => {
+                                            e.currentTarget.style.color = cat.active ? '#94a3b8' : '#059669';
+                                            e.currentTarget.style.backgroundColor = cat.active ? 'transparent' : '#ecfdf5';
+                                        }}
                                         title={cat.active ? "Desactivar" : "Activar"}
                                     >
                                         <Power size={18} />
@@ -273,17 +329,64 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
                                     )}
 
                                     {catSubs.map(sub => (
-                                        <div key={sub.id} className="group flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200 ml-4 sm:ml-8 hover:border-[var(--admin-accent)] transition-colors">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-[var(--admin-accent)] transition-colors"></div>
-                                                <span className={`text-sm font-medium ${!sub.active && 'text-gray-400 line-through'}`}>{sub.name}</span>
+                                        <div key={sub.id} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            backgroundColor: 'white',
+                                            padding: '12px',
+                                            borderRadius: '8px',
+                                            border: '1px solid #e2e8f0',
+                                            marginLeft: '2rem',
+                                            position: 'relative',
+                                            transition: 'all 0.2s',
+                                            cursor: 'default'
+                                        }}
+                                            onMouseOver={(e) => { e.currentTarget.style.borderColor = '#a5b4fc'; e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)'; }}
+                                            onMouseOut={(e) => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.boxShadow = 'none'; }}
+                                        >
+                                            {/* Decorative tree line */}
+                                            <div style={{ position: 'absolute', left: '-1rem', top: '50%', width: '1rem', height: '2px', backgroundColor: '#e2e8f0' }}></div>
+                                            <div style={{ position: 'absolute', left: '-1rem', top: '-100%', width: '2px', height: '150%', backgroundColor: '#e2e8f0' }} className="hidden sm:block"></div>
+
+                                            <div className="flex items-center gap-3 relative z-10">
+                                                <div style={{
+                                                    width: '32px', height: '32px', borderRadius: '4px', backgroundColor: '#f8fafc',
+                                                    border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    color: '#94a3b8'
+                                                }}>
+                                                    <FolderOpen size={16} strokeWidth={2.5} />
+                                                </div>
+                                                <span style={{
+                                                    fontSize: '15px', fontWeight: '600',
+                                                    color: sub.active ? '#334155' : '#cbd5e1',
+                                                    textDecoration: sub.active ? 'none' : 'line-through'
+                                                }}>
+                                                    {capitalizeWords(sub.name)}
+                                                </span>
                                             </div>
                                             <button
                                                 onClick={() => toggleSubcategoryStatus(sub)}
-                                                className={`p-1.5 rounded transition-colors opacity-0 group-hover:opacity-100 ${sub.active ? 'text-gray-300 hover:text-red-500' : 'text-green-500 opacity-100'}`}
+                                                style={{
+                                                    padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                                                    color: sub.active ? '#cbd5e1' : '#10b981',
+                                                    backgroundColor: sub.active ? 'transparent' : '#ecfdf5',
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    if (sub.active) {
+                                                        e.currentTarget.style.color = '#dc2626';
+                                                        e.currentTarget.style.backgroundColor = '#fef2f2';
+                                                    } else {
+                                                        e.currentTarget.style.backgroundColor = '#d1fae5';
+                                                    }
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.currentTarget.style.color = sub.active ? '#cbd5e1' : '#10b981';
+                                                    e.currentTarget.style.backgroundColor = sub.active ? 'transparent' : '#ecfdf5';
+                                                }}
                                                 title={sub.active ? "Desactivar" : "Activar"}
                                             >
-                                                <Power size={14} />
+                                                <Power size={18} />
                                             </button>
                                         </div>
                                     ))}

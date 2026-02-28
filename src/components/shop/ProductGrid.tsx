@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
+import AutoRotatingImage from "./AutoRotatingImage";
 
 interface Product {
     uid: string;
@@ -52,13 +53,16 @@ export default function ProductGrid({ limit }: ProductGridProps) {
         }
     };
 
-    // Helper function to get image URL (handle both string and array)
-    const getImageUrl = (imageUrl: string | string[] | null): string | null => {
-        if (!imageUrl) return null;
-        if (Array.isArray(imageUrl)) {
-            return imageUrl.length > 0 ? imageUrl[0] : null;
+    // Helper function to get image array
+    const getImageUrlArray = (imageUrl: string | string[] | null): string[] => {
+        if (!imageUrl) return [];
+        if (Array.isArray(imageUrl)) return imageUrl;
+        try {
+            const parsed = JSON.parse(imageUrl);
+            return Array.isArray(parsed) ? parsed : [imageUrl];
+        } catch {
+            return [imageUrl];
         }
-        return imageUrl;
     };
 
     if (loading) {
@@ -138,16 +142,12 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                         overflow: 'hidden',
                         position: 'relative' // Needed for absolute positioning of watermark
                     }}>
-                        {getImageUrl(product.image_url) ? (
+                        {getImageUrlArray(product.image_url).length > 0 ? (
                             <>
-                                <img
-                                    src={getImageUrl(product.image_url)!}
+                                <AutoRotatingImage
+                                    images={getImageUrlArray(product.image_url)}
                                     alt={product.name}
-                                    style={{
-                                        width: '100%',
-                                        height: 'auto',
-                                        display: 'block'
-                                    }}
+                                    interval={3000 + (Math.random() * 2000)} // slight random offset so they don't all flip exactly at the same time
                                 />
                                 {/* Watermark */}
                                 <div style={{

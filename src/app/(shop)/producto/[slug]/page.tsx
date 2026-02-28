@@ -40,8 +40,11 @@ export default function ProductDetailPage() {
 
     const fetchProductAndRelated = async () => {
         try {
+            // Check if slug is UUID
+            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slug);
+
             // Fetch main product
-            const { data: productData, error: productError } = await supabase
+            let query = supabase
                 .from("products")
                 .select(`
                     *,
@@ -49,9 +52,25 @@ export default function ProductDetailPage() {
                     subcategories (name, id),
                     product_images (image_url)
                 `)
-                .eq("code", slug)
-                .eq("active", true)
-                .single();
+                .eq(isUuid ? "uid" : "code", slug)
+                .eq("active", true);
+
+            let productData;
+            let productError;
+
+            if (isUuid) {
+                const { data, error } = await query.single();
+                productData = data;
+                productError = error;
+            } else {
+                const { data, error } = await query.limit(1);
+                productData = data?.[0];
+                productError = error;
+                // If data is empty array, trigger not found error
+                if (!productData && !error) {
+                    productError = new Error("Product not found");
+                }
+            }
 
             if (productError) throw productError;
 
@@ -391,7 +410,7 @@ export default function ProductDetailPage() {
                                 {relatedProducts.map((relatedProduct) => (
                                     <Link
                                         key={relatedProduct.uid}
-                                        href={`/producto/${relatedProduct.code}`}
+                                        href={`/producto/${relatedProduct.uid}`}
                                         style={{ textDecoration: 'none' }}
                                     >
                                         <div

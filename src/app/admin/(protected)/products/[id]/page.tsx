@@ -40,8 +40,12 @@ export default async function EditProductPage({ params }: PageProps) {
     // Fallback: if product_images is empty but product has image_url, use that
     let imagesToShow = productImages || [];
     if (imagesToShow.length === 0 && product.image_url) {
-        // Convert single image_url to product_images format
-        imagesToShow = [{ image_url: product.image_url }];
+        // Convert array of strings to product_images format
+        if (Array.isArray(product.image_url)) {
+            imagesToShow = product.image_url.map((url: string) => ({ image_url: url }));
+        } else if (typeof product.image_url === 'string') {
+            imagesToShow = [{ image_url: product.image_url }];
+        }
     }
 
     const productWithImages = {

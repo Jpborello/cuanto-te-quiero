@@ -7,6 +7,7 @@ import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import { ShoppingCart } from "lucide-react";
 import Link from "next/link";
+import AutoRotatingImage from "@/components/shop/AutoRotatingImage";
 
 interface Product {
     uid: string;
@@ -234,7 +235,7 @@ export default function SubcategoryPage() {
                             {products.map((product) => (
                                 <Link
                                     key={product.uid}
-                                    href={`/producto/${product.code}`}
+                                    href={`/producto/${product.uid}`}
                                     style={{ textDecoration: 'none' }}
                                 >
                                     <div
@@ -270,14 +271,10 @@ export default function SubcategoryPage() {
                                         }}>
                                             {product.images && product.images.length > 0 ? (
                                                 <>
-                                                    <img
-                                                        src={product.images[0]}
+                                                    <AutoRotatingImage
+                                                        images={product.images}
                                                         alt={product.name}
-                                                        style={{
-                                                            width: '100%',
-                                                            height: 'auto',
-                                                            display: 'block'
-                                                        }}
+                                                        interval={3000 + (Math.random() * 2000)}
                                                     />
                                                     {/* Watermark */}
                                                     <div style={{

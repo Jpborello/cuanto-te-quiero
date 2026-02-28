@@ -117,8 +117,8 @@ export default function ProductForm({ initialData, categories, subcategories }: 
                 price: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
                 active: formData.active,
-                // Legacy support if schema has image_url on products table
-                image_url: images[0] || null
+                // El schema guarda las imágenes como un arreglo en el campo image_url
+                image_url: images.length > 0 ? images : null
             };
 
             let productUid = initialData?.uid; // Use uid instead of id
@@ -140,26 +140,6 @@ export default function ProductForm({ initialData, categories, subcategories }: 
 
                 if (error) throw error;
                 productUid = data.uid; // Get the auto-generated uid
-            }
-
-            // Verify if product_images table exists and update it
-            // First delete existing images for this product (simple sync strategy)
-            if (initialData) {
-                await supabase.from("product_images").delete().eq("product_id", productUid);
-            }
-
-            // Insert new images
-            if (images.length > 0) {
-                const imageInserts = images.map((url, index) => ({
-                    product_id: productUid, // Use uid for foreign key
-                    image_url: url, // Ensure this is a string
-                    display_order: index // Optional: track image order
-                }));
-                const { error: imgError } = await supabase.from("product_images").insert(imageInserts);
-                if (imgError) {
-                    console.error("Error inserting product images:", imgError);
-                    throw new Error(`Error al guardar imágenes: ${imgError.message}`);
-                }
             }
 
             router.push("/admin/products");

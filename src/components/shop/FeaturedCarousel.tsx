@@ -204,7 +204,7 @@ export default function FeaturedCarousel() {
                     </p>
                 )}
 
-                <Link href={`/producto/${currentProduct.code}`} className="featured-button">
+                <Link href={`/producto/${currentProduct.uid}`} className="featured-button">
                     <ShoppingCart size={22} />
                     Ver Detalles
                 </Link>

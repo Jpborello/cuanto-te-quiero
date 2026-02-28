@@ -2,6 +2,8 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+
+export const dynamic = 'force-dynamic';
 import ProductActions from "@/components/admin/ProductActions";
 
 // Group products by subcategory
