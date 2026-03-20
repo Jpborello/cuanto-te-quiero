@@ -47,34 +47,31 @@ export default function SubcategoryPage() {
             console.log('[DEBUG] slug:', slug);
             console.log('[DEBUG] subslug:', subslug);
 
-            // 1. Helper to generate slug (must match Header logic)
-            const getSlug = (name: string) => {
-                return name.toLowerCase()
-                    .replace(/\s+/g, '-')
-                    .replace(/[áàäâ]/g, 'a')
-                    .replace(/[éèëê]/g, 'e')
-                    .replace(/[íìïî]/g, 'i')
-                    .replace(/[óòöô]/g, 'o')
-                    .replace(/[úùüû]/g, 'u')
-                    .replace(/ñ/g, 'n');
+            // 1. Helper to aggressively normalize any string for robust comparison
+            const normalizeString = (str: string) => {
+                if (!str) return '';
+                // First decode URI component in case it's encoded
+                try { str = decodeURIComponent(str); } catch (e) {}
+                
+                return str.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
+                    .replace(/ñ/g, 'n') // handle ñ
+                    .replace(/[^a-z0-9]/g, ''); // remove all non-alphanumeric (spaces, hyphens, etc)
             };
 
-            // 2. Fetch Category first to get ID (and ensure hierarchy)
-            // Reconstruct category name from slug (this usually works better for simple names, 
-            // OR ideally we should just list categories and match slug like we do for subcategory)
-            // But let's assume category name reconstruction is "safe enough" OR fetch all categories.
-            // Let's fetch all categories to be safe.
+            // 2. Fetch Category first
             const { data: allCategories, error: catError } = await supabase
                 .from("categories")
                 .select("*");
 
             if (catError) throw catError;
 
-            // Find matching category
-            const categoryData = allCategories.find(c => getSlug(c.name) === slug);
+            // Find matching category by normalizing both sides
+            const normalizedSlug = normalizeString(slug);
+            const categoryData = allCategories.find(c => normalizeString(c.name) === normalizedSlug);
 
             if (!categoryData) {
-                console.error("Category not found for slug:", slug);
+                console.error("Category not found for slug:", slug, "Normalized:", normalizedSlug);
                 throw new Error("Category not found");
             }
 
@@ -86,13 +83,14 @@ export default function SubcategoryPage() {
 
             if (subError) throw subError;
 
-            // 4. Find matching subcategory by slug
-            const subcategoryData = allSubcats.find(s => getSlug(s.name) === subslug);
+            // 4. Find matching subcategory by robust normalization
+            const normalizedSubslug = normalizeString(subslug);
+            const subcategoryData = allSubcats.find(s => normalizeString(s.name) === normalizedSubslug);
 
             if (!subcategoryData) {
-                console.error("Subcategory not found for subslug:", subslug);
+                console.error("Subcategory not found for subslug:", subslug, "Normalized:", normalizedSubslug);
+                console.error("Available subcategories:", allSubcats.map(s => s.name));
                 // Fallback: try direct name match if slug fails (legacy behavior expectation?)
-                // Or just throw.
                 throw new Error("Subcategory not found");
             }
 

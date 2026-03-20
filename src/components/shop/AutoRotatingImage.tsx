@@ -11,17 +11,25 @@ interface AutoRotatingImageProps {
 export default function AutoRotatingImage({ images, alt, interval = 3000 }: AutoRotatingImageProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    const validImages = (images || []).map(img => {
+        if (typeof img === 'string') return img;
+        if (img && typeof img === 'object') {
+            return (img as any).url || (img as any).src || (img as any).image_url || '';
+        }
+        return '';
+    }).filter(src => src && typeof src === 'string' && src.trim() !== '');
+
     useEffect(() => {
-        if (!images || images.length <= 1) return;
+        if (validImages.length <= 1) return;
 
         const timer = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % images.length);
+            setCurrentIndex((prev) => (prev + 1) % validImages.length);
         }, interval);
 
         return () => clearInterval(timer);
-    }, [images, interval]);
+    }, [validImages.length, interval]);
 
-    if (!images || images.length === 0) {
+    if (validImages.length === 0) {
         return (
             <div style={{ color: '#ccc', fontSize: '4rem' }}>
                 📦
@@ -40,9 +48,9 @@ export default function AutoRotatingImage({ images, alt, interval = 3000 }: Auto
             alignItems: 'center',
             justifyContent: 'center',
         }}>
-            {images.map((img, index) => (
+            {validImages.map((img, index) => (
                 <img
-                    key={img}
+                    key={index}
                     src={img}
                     alt={`${alt} - vista ${index + 1}`}
                     style={{

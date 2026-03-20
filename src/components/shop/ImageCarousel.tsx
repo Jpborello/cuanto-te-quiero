@@ -11,17 +11,26 @@ interface ImageCarouselProps {
 export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    // Pre-procesar las imágenes para extraer los URLs válidos y descartar los vacíos o rotos
+    const validImages = (images || []).map(img => {
+        if (typeof img === 'string') return img;
+        if (img && typeof img === 'object') {
+            return (img as any).url || (img as any).src || (img as any).image_url || '';
+        }
+        return '';
+    }).filter(src => src && typeof src === 'string' && src.trim() !== '');
+
     useEffect(() => {
-        if (!images || images.length <= 1) return;
+        if (validImages.length <= 1) return;
 
         const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % images.length);
+            setCurrentIndex((prev) => (prev + 1) % validImages.length);
         }, 3000); // Cambiar cada 3 segundos
 
         return () => clearInterval(interval);
-    }, [images]);
+    }, [validImages.length]);
 
-    if (!images || images.length === 0) {
+    if (validImages.length === 0) {
         return (
             <div style={{
                 width: '100%',
@@ -44,7 +53,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
             overflow: 'hidden'
         }}>
             {/* Images */}
-            {images.map((image, index) => (
+            {validImages.map((image, index) => (
                 <div
                     key={index}
                     style={{
@@ -77,7 +86,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
             ))}
 
             {/* Indicators */}
-            {images.length > 1 && (
+            {validImages.length > 1 && (
                 <div style={{
                     position: 'absolute',
                     bottom: '16px',
@@ -87,7 +96,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
                     gap: '8px',
                     zIndex: 10
                 }}>
-                    {images.map((_, index) => (
+                    {validImages.map((_, index) => (
                         <div
                             key={index}
                             style={{
