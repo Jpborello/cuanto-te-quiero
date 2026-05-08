@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Search, X } from "lucide-react";
 import Link from "next/link";
 import AutoRotatingImage from "@/components/shop/AutoRotatingImage";
 
@@ -36,6 +36,7 @@ export default function SubcategoryPage() {
     const [subcategory, setSubcategory] = useState<Subcategory | null>(null);
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [filterText, setFilterText] = useState("");
 
     useEffect(() => {
         fetchSubcategoryAndProducts();
@@ -190,29 +191,84 @@ export default function SubcategoryPage() {
         );
     }
 
+    const filteredProducts = filterText.trim().length >= 1
+        ? products.filter(p => p.name.toLowerCase().includes(filterText.toLowerCase()))
+        : products;
+
     return (
         <>
             <Header />
             <main style={{ minHeight: '100vh', padding: '4rem 2rem' }}>
                 <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
                     {/* Header de subcategoría */}
-                    <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
+                    <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
                         <h1 style={{
                             fontSize: '2.5rem',
                             fontWeight: 'bold',
                             color: '#333',
-                            marginBottom: '1rem',
+                            marginBottom: '0.5rem',
                             textTransform: 'uppercase'
                         }}>
                             {subcategory.name}
                         </h1>
                         <p style={{ color: '#666', fontSize: '1.125rem' }}>
-                            {products.length} {products.length === 1 ? 'producto' : 'productos'} disponibles
+                            {filteredProducts.length} {filteredProducts.length === 1 ? 'producto' : 'productos'} disponibles
                         </p>
                     </div>
 
+                    {/* Barra de filtro */}
+                    {products.length > 4 && (
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            marginBottom: '2rem'
+                        }}>
+                            <div style={{ position: 'relative', width: '100%', maxWidth: '420px' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Filtrar dentro de esta categoría..."
+                                    value={filterText}
+                                    onChange={(e) => setFilterText(e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem 2.8rem 0.75rem 2.8rem',
+                                        border: '1.5px solid #ffc0cb',
+                                        borderRadius: '50px',
+                                        fontSize: '0.95rem',
+                                        outline: 'none',
+                                        backgroundColor: 'white',
+                                        boxShadow: '0 2px 8px rgba(255,192,203,0.2)',
+                                        boxSizing: 'border-box'
+                                    }}
+                                />
+                                <Search size={16} style={{
+                                    position: 'absolute',
+                                    left: '1rem',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: '#ffc0cb',
+                                    pointerEvents: 'none'
+                                }} />
+                                {filterText && (
+                                    <X
+                                        size={15}
+                                        onClick={() => setFilterText('')}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '1rem',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            color: '#aaa',
+                                            cursor: 'pointer'
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Grid de productos */}
-                    {products.length === 0 ? (
+                    {filteredProducts.length === 0 ? (
                         <div style={{
                             textAlign: 'center',
                             padding: '4rem 2rem',
@@ -230,7 +286,7 @@ export default function SubcategoryPage() {
                             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                             gap: '2rem'
                         }}>
-                            {products.map((product) => (
+                            {filteredProducts.map((product) => (
                                 <Link
                                     key={product.uid}
                                     href={`/producto/${product.uid}`}

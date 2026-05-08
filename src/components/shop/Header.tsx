@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 interface Category {
@@ -11,10 +12,12 @@ interface Category {
 }
 
 export default function Header() {
+    const router = useRouter();
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
     const [cartCount] = useState(0);
     const [categories, setCategories] = useState<Category[]>([]);
     const [searchFocused, setSearchFocused] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         fetchCategories();
@@ -44,6 +47,20 @@ export default function Header() {
             setCategories(sortedCategories);
         } catch (error) {
             console.error("Error fetching categories:", error);
+        }
+    };
+
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && searchQuery.trim().length >= 2) {
+            router.push(`/buscar?q=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchFocused(false);
+        }
+    };
+
+    const handleSearchClick = () => {
+        if (searchQuery.trim().length >= 2) {
+            router.push(`/buscar?q=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchFocused(false);
         }
     };
 
@@ -193,10 +210,13 @@ export default function Header() {
                         }} className="desktop-search">
                             <input
                                 type="text"
-                                placeholder="Buscar..."
+                                placeholder="Buscar productos..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={handleSearch}
                                 style={{
                                     width: '100%',
-                                    padding: '0.6rem 1rem 0.6rem 2.5rem',
+                                    padding: '0.6rem 2.5rem 0.6rem 2.5rem',
                                     border: '1px solid transparent',
                                     backgroundColor: 'white',
                                     borderRadius: '50px',
@@ -208,13 +228,32 @@ export default function Header() {
                                 onFocus={() => setSearchFocused(true)}
                                 onBlur={() => setSearchFocused(false)}
                             />
-                            <Search size={16} style={{
-                                position: 'absolute',
-                                left: '1rem',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#ffc0cb'
-                            }} />
+                            <Search
+                                size={16}
+                                onClick={handleSearchClick}
+                                style={{
+                                    position: 'absolute',
+                                    left: '1rem',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: '#ffc0cb',
+                                    cursor: 'pointer'
+                                }}
+                            />
+                            {searchQuery && (
+                                <X
+                                    size={14}
+                                    onClick={() => setSearchQuery('')}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '1rem',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        color: '#aaa',
+                                        cursor: 'pointer'
+                                    }}
+                                />
+                            )}
                         </div>
 
                         {/* Icons */}

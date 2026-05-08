@@ -106,6 +106,15 @@ export default async function AdminProducts() {
 
                                         {/* Badges */}
                                         <div className="product-card-badges">
+                                            {!product.image_url && (
+                                                <span
+                                                    className="product-card-featured"
+                                                    title="Sin imagen"
+                                                    style={{ background: '#fee2e2', color: '#dc2626', fontSize: '0.65rem', padding: '0.2rem 0.5rem', borderRadius: '6px' }}
+                                                >
+                                                    📷 Sin foto
+                                                </span>
+                                            )}
                                             {product.featured && (
                                                 <span className="product-card-featured" title="Destacado">⭐</span>
                                             )}
