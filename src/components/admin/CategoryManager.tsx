@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, Plus, Power, Save, Trash2, FolderOpen, Tag, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Power, Save, Trash2, FolderOpen, Tag, Loader2, Pencil } from "lucide-react";
 
 interface Category {
     id: string;
@@ -42,6 +42,12 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
     const [newSubName, setNewSubName] = useState("");
 
     const [loading, setLoading] = useState(false);
+
+    // Edit state
+    const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+    const [editingCategoryName, setEditingCategoryName] = useState("");
+    const [editingSubcategoryId, setEditingSubcategoryId] = useState<string | null>(null);
+    const [editingSubcategoryName, setEditingSubcategoryName] = useState("");
 
     const toggleExpand = (catId: string) => {
         const newSet = new Set(expandedCategories);
@@ -105,6 +111,56 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
         } catch (error) {
             console.error("Error creating subcategory:", error);
             alert("Error al crear subcategoría");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateCategory = async (catId: string) => {
+        if (!editingCategoryName.trim()) return;
+        setLoading(true);
+
+        try {
+            const { error } = await supabase
+                .from("categories")
+                .update({ name: editingCategoryName })
+                .eq("id", catId);
+
+            if (error) throw error;
+
+            setCategories(categories.map(c =>
+                c.id === catId ? { ...c, name: editingCategoryName } : c
+            ));
+            setEditingCategoryId(null);
+            router.refresh();
+        } catch (error) {
+            console.error("Error updating category:", error);
+            alert("Error al actualizar la categoría");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleUpdateSubcategory = async (subId: string) => {
+        if (!editingSubcategoryName.trim()) return;
+        setLoading(true);
+
+        try {
+            const { error } = await supabase
+                .from("subcategories")
+                .update({ name: editingSubcategoryName })
+                .eq("id", subId);
+
+            if (error) throw error;
+
+            setSubcategories(subcategories.map(s =>
+                s.id === subId ? { ...s, name: editingSubcategoryName } : s
+            ));
+            setEditingSubcategoryId(null);
+            router.refresh();
+        } catch (error) {
+            console.error("Error updating subcategory:", error);
+            alert("Error al actualizar la subcategoría");
         } finally {
             setLoading(false);
         }
@@ -211,29 +267,89 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
                                 </button>
 
                                 <div className="flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <h3 style={{
-                                            fontWeight: 'bold',
-                                            fontSize: '19px',
-                                            letterSpacing: '-0.025em',
-                                            color: cat.active ? '#1e293b' : '#94a3b8',
-                                            textDecoration: cat.active ? 'none' : 'line-through'
-                                        }}>
-                                            {capitalizeWords(cat.name)}
-                                        </h3>
-                                        <span style={{
-                                            fontSize: '10px',
-                                            padding: '2px 8px',
-                                            borderRadius: '9999px',
-                                            fontWeight: 'bold',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.05em',
-                                            backgroundColor: cat.active ? '#dcfce7' : '#f1f5f9',
-                                            color: cat.active ? '#15803d' : '#475569'
-                                        }}>
-                                            {cat.active ? 'Activa' : 'Inactiva'}
-                                        </span>
-                                    </div>
+                                    {editingCategoryId === cat.id ? (
+                                        <div className="flex items-center gap-2 bg-white p-1 rounded-lg border shadow-sm animate-in fade-in max-w-md my-0.5">
+                                            <input
+                                                autoFocus
+                                                type="text"
+                                                className="bg-transparent outline-none px-2 text-sm font-semibold text-[#1e293b] w-full max-w-[200px] sm:max-w-xs"
+                                                value={editingCategoryName}
+                                                onChange={e => setEditingCategoryName(e.target.value)}
+                                                onKeyDown={e => {
+                                                    if (e.key === 'Enter') handleUpdateCategory(cat.id);
+                                                    if (e.key === 'Escape') setEditingCategoryId(null);
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => handleUpdateCategory(cat.id)}
+                                                disabled={loading}
+                                                className="p-1 bg-[var(--admin-accent)] text-white rounded hover:bg-[var(--admin-accent-hover)] transition-colors"
+                                                title="Guardar"
+                                            >
+                                                {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                                            </button>
+                                            <button
+                                                onClick={() => setEditingCategoryId(null)}
+                                                className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+                                                title="Cancelar"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h3 style={{
+                                                fontWeight: 'bold',
+                                                fontSize: '19px',
+                                                letterSpacing: '-0.025em',
+                                                color: cat.active ? '#1e293b' : '#94a3b8',
+                                                textDecoration: cat.active ? 'none' : 'line-through'
+                                            }}>
+                                                {capitalizeWords(cat.name)}
+                                            </h3>
+                                            <button
+                                                onClick={() => {
+                                                    setEditingCategoryId(cat.id);
+                                                    setEditingCategoryName(cat.name);
+                                                }}
+                                                style={{
+                                                    padding: '4px',
+                                                    borderRadius: '6px',
+                                                    color: '#94a3b8',
+                                                    backgroundColor: 'transparent',
+                                                    border: 'none',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    e.currentTarget.style.color = 'var(--admin-accent)';
+                                                    e.currentTarget.style.backgroundColor = '#f1f5f9';
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    e.currentTarget.style.color = '#94a3b8';
+                                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                                title="Editar Nombre"
+                                            >
+                                                <Pencil size={15} />
+                                            </button>
+                                            <span style={{
+                                                fontSize: '10px',
+                                                padding: '2px 8px',
+                                                borderRadius: '9999px',
+                                                fontWeight: 'bold',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.05em',
+                                                backgroundColor: cat.active ? '#dcfce7' : '#f1f5f9',
+                                                color: cat.active ? '#15803d' : '#475569'
+                                            }}>
+                                                {cat.active ? 'Activa' : 'Inactiva'}
+                                            </span>
+                                        </div>
+                                    )}
                                     <p className="text-xs text-gray-400 mt-0.5">{catSubs.length} subcategorías</p>
                                 </div>
 
@@ -349,21 +465,84 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
                                             <div style={{ position: 'absolute', left: '-1rem', top: '50%', width: '1rem', height: '2px', backgroundColor: '#e2e8f0' }}></div>
                                             <div style={{ position: 'absolute', left: '-1rem', top: '-100%', width: '2px', height: '150%', backgroundColor: '#e2e8f0' }} className="hidden sm:block"></div>
 
-                                            <div className="flex items-center gap-3 relative z-10">
+                                            <div className="flex items-center gap-3 relative z-10 flex-1">
                                                 <div style={{
                                                     width: '32px', height: '32px', borderRadius: '4px', backgroundColor: '#f8fafc',
                                                     border: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    color: '#94a3b8'
+                                                    color: '#94a3b8',
+                                                    flexShrink: 0
                                                 }}>
                                                     <FolderOpen size={16} strokeWidth={2.5} />
                                                 </div>
-                                                <span style={{
-                                                    fontSize: '15px', fontWeight: '600',
-                                                    color: sub.active ? '#334155' : '#cbd5e1',
-                                                    textDecoration: sub.active ? 'none' : 'line-through'
-                                                }}>
-                                                    {capitalizeWords(sub.name)}
-                                                </span>
+                                                {editingSubcategoryId === sub.id ? (
+                                                    <div className="flex items-center gap-2 bg-white p-1 rounded-lg border shadow-sm animate-in fade-in flex-1 max-w-md">
+                                                        <input
+                                                            autoFocus
+                                                            type="text"
+                                                            className="bg-transparent outline-none px-2 text-sm font-semibold text-[#334155] w-full"
+                                                            value={editingSubcategoryName}
+                                                            onChange={e => setEditingSubcategoryName(e.target.value)}
+                                                            onKeyDown={e => {
+                                                                if (e.key === 'Enter') handleUpdateSubcategory(sub.id);
+                                                                if (e.key === 'Escape') setEditingSubcategoryId(null);
+                                                            }}
+                                                        />
+                                                        <button
+                                                            onClick={() => handleUpdateSubcategory(sub.id)}
+                                                            disabled={loading}
+                                                            className="p-1 bg-[var(--admin-accent)] text-white rounded hover:bg-[var(--admin-accent-hover)] transition-colors"
+                                                            title="Guardar"
+                                                        >
+                                                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingSubcategoryId(null)}
+                                                            className="p-1 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+                                                            title="Cancelar"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <span style={{
+                                                            fontSize: '15px', fontWeight: '600',
+                                                            color: sub.active ? '#334155' : '#cbd5e1',
+                                                            textDecoration: sub.active ? 'none' : 'line-through'
+                                                        }}>
+                                                            {capitalizeWords(sub.name)}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingSubcategoryId(sub.id);
+                                                                setEditingSubcategoryName(sub.name);
+                                                            }}
+                                                            style={{
+                                                                padding: '4px',
+                                                                borderRadius: '6px',
+                                                                color: '#cbd5e1',
+                                                                backgroundColor: 'transparent',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.2s',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.currentTarget.style.color = 'var(--admin-accent)';
+                                                                e.currentTarget.style.backgroundColor = '#f1f5f9';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.currentTarget.style.color = '#cbd5e1';
+                                                                e.currentTarget.style.backgroundColor = 'transparent';
+                                                            }}
+                                                            title="Editar Nombre"
+                                                        >
+                                                            <Pencil size={13} />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                             <button
                                                 onClick={() => toggleSubcategoryStatus(sub)}

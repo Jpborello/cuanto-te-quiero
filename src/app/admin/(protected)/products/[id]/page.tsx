@@ -61,7 +61,7 @@ export default async function EditProductPage({ params }: PageProps) {
                 </Link>
                 <div>
                     <h1 className="admin-page-title text-xl mb-0">Editar Producto</h1>
-                    <p className="text-sm text-gray-500">#{product.id} - {product.name}</p>
+                    <p className="text-sm text-gray-500">#{product.product_id} - {product.name}</p>
                 </div>
             </div>
 

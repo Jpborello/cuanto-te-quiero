@@ -35,7 +35,7 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                 .from("products")
                 .select("*")
                 .eq("active", true)
-                .order("product_id", { ascending: true });
+                .order("code", { ascending: true });
 
             // Si hay un límite, aplicarlo
             if (limit) {

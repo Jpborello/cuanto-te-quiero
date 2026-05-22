@@ -30,7 +30,7 @@ export default function ProductForm({ initialData, categories, subcategories }: 
 
     // Form State
     const [formData, setFormData] = useState({
-        custom_id: initialData?.id || "", // Manual ID (4 digits)
+        custom_id: initialData?.product_id || "", // Manual ID (4 digits)
         name: initialData?.name || "",
         description: initialData?.description || "",
         category_id: initialData?.category_id || "",
@@ -110,6 +110,7 @@ export default function ProductForm({ initialData, categories, subcategories }: 
         try {
             const productPayload = {
                 product_id: formData.custom_id.toString().trim(), // Internal alphanumeric ID
+                code: formData.custom_id.toString().trim(), // Keep code column in sync for URLs and storefront sorting
                 name: formData.name,
                 description: formData.description,
                 category_id: formData.category_id || null,

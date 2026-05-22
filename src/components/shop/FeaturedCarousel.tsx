@@ -42,7 +42,7 @@ export default function FeaturedCarousel() {
                 .select("*")
                 .eq("active", true)
                 .eq("featured", true)
-                .order("product_id", { ascending: true })
+                .order("code", { ascending: true })
                 .limit(6);
 
             if (error) {
@@ -57,7 +57,7 @@ export default function FeaturedCarousel() {
                     .from("products")
                     .select("*")
                     .eq("active", true)
-                    .order("product_id", { ascending: true })
+                    .order("code", { ascending: true })
                     .limit(6);
 
                 if (fallback.error) throw fallback.error;
