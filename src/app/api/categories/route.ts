@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAdmin } from "@/lib/isAdmin";
 
+export const dynamic = "force-dynamic";
+
+
 export async function POST(req: NextRequest) {
     const isUserAdmin = await isAdmin();
     if (!isUserAdmin) {
