@@ -1,6 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
 
 export async function isAdmin() {
+    // Bypass authorization check in local development to match the disabled layout redirect
+    if (process.env.NODE_ENV === "development") {
+        return true;
+    }
+
     const supabase = await createClient();
 
     const {

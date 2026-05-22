@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, Plus, Power, Save, Trash2, FolderOpen, Tag, Loader2, Pencil } from "lucide-react";
 
@@ -66,21 +65,22 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
         setLoading(true);
 
         try {
-            const { data, error } = await supabase
-                .from("categories")
-                .insert({ name: newCategoryName, active: true })
-                .select()
-                .single();
+            const response = await fetch("/api/categories", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newCategoryName, active: true })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al crear categoría");
 
-            setCategories([...categories, data]);
+            setCategories([...categories, result]);
             setNewCategoryName("");
             setCreatingCategory(false);
             router.refresh();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating category:", error);
-            alert("Error al crear categoría");
+            alert(error.message || "Error al crear categoría");
         } finally {
             setLoading(false);
         }
@@ -91,15 +91,16 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
         setLoading(true);
 
         try {
-            const { data, error } = await supabase
-                .from("subcategories")
-                .insert({ name: newSubName, category_id: categoryId, active: true })
-                .select()
-                .single();
+            const response = await fetch("/api/subcategories", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newSubName, category_id: categoryId, active: true })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al crear subcategoría");
 
-            setSubcategories([...subcategories, data]);
+            setSubcategories([...subcategories, result]);
             setNewSubName("");
             setCreatingSubFor(null);
 
@@ -108,9 +109,9 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
                 toggleExpand(categoryId);
             }
             router.refresh();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error creating subcategory:", error);
-            alert("Error al crear subcategoría");
+            alert(error.message || "Error al crear subcategoría");
         } finally {
             setLoading(false);
         }
@@ -121,21 +122,23 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
         setLoading(true);
 
         try {
-            const { error } = await supabase
-                .from("categories")
-                .update({ name: editingCategoryName })
-                .eq("id", catId);
+            const response = await fetch("/api/categories", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: catId, name: editingCategoryName })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al actualizar la categoría");
 
             setCategories(categories.map(c =>
                 c.id === catId ? { ...c, name: editingCategoryName } : c
             ));
             setEditingCategoryId(null);
             router.refresh();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating category:", error);
-            alert("Error al actualizar la categoría");
+            alert(error.message || "Error al actualizar la categoría");
         } finally {
             setLoading(false);
         }
@@ -146,21 +149,23 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
         setLoading(true);
 
         try {
-            const { error } = await supabase
-                .from("subcategories")
-                .update({ name: editingSubcategoryName })
-                .eq("id", subId);
+            const response = await fetch("/api/subcategories", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: subId, name: editingSubcategoryName })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al actualizar la subcategoría");
 
             setSubcategories(subcategories.map(s =>
                 s.id === subId ? { ...s, name: editingSubcategoryName } : s
             ));
             setEditingSubcategoryId(null);
             router.refresh();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating subcategory:", error);
-            alert("Error al actualizar la subcategoría");
+            alert(error.message || "Error al actualizar la subcategoría");
         } finally {
             setLoading(false);
         }
@@ -168,37 +173,65 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
 
     const toggleCategoryStatus = async (cat: Category) => {
         try {
-            const { error } = await supabase
-                .from("categories")
-                .update({ active: !cat.active })
-                .eq("id", cat.id);
+            const response = await fetch("/api/categories", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: cat.id, active: !cat.active })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al actualizar estado");
 
             setCategories(categories.map(c =>
                 c.id === cat.id ? { ...c, active: !c.active } : c
             ));
             router.refresh();
-        } catch (error) {
-            alert("Error al actualizar estado");
+        } catch (error: any) {
+            alert(error.message || "Error al actualizar estado");
         }
     };
 
     const toggleSubcategoryStatus = async (sub: Subcategory) => {
         try {
-            const { error } = await supabase
-                .from("subcategories")
-                .update({ active: !sub.active })
-                .eq("id", sub.id);
+            const response = await fetch("/api/subcategories", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: sub.id, active: !sub.active })
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al actualizar estado");
 
             setSubcategories(subcategories.map(s =>
                 s.id === sub.id ? { ...s, active: !s.active } : s
             ));
             router.refresh();
-        } catch (error) {
-            alert("Error al actualizar estado");
+        } catch (error: any) {
+            alert(error.message || "Error al actualizar estado");
+        }
+    };
+
+    const handleDeleteSubcategory = async (subId: string, subName: string) => {
+        if (!confirm(`¿Estás seguro de que deseas eliminar la subcategoría "${subName}"?`)) return;
+        setLoading(true);
+
+        try {
+            const response = await fetch("/api/subcategories", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: subId })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al eliminar la subcategoría");
+
+            setSubcategories(subcategories.filter(s => s.id !== subId));
+            router.refresh();
+        } catch (error: any) {
+            console.error("Error deleting subcategory:", error);
+            alert(error.message || "Error al eliminar la subcategoría");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -544,29 +577,50 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
                                                     </div>
                                                 )}
                                             </div>
-                                            <button
-                                                onClick={() => toggleSubcategoryStatus(sub)}
-                                                style={{
-                                                    padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
-                                                    color: sub.active ? '#cbd5e1' : '#10b981',
-                                                    backgroundColor: sub.active ? 'transparent' : '#ecfdf5',
-                                                }}
-                                                onMouseOver={(e) => {
-                                                    if (sub.active) {
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={() => toggleSubcategoryStatus(sub)}
+                                                    style={{
+                                                        padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                                                        color: sub.active ? '#cbd5e1' : '#10b981',
+                                                        backgroundColor: sub.active ? 'transparent' : '#ecfdf5',
+                                                    }}
+                                                    onMouseOver={(e) => {
+                                                        if (sub.active) {
+                                                            e.currentTarget.style.color = '#dc2626';
+                                                            e.currentTarget.style.backgroundColor = '#fef2f2';
+                                                        } else {
+                                                            e.currentTarget.style.backgroundColor = '#d1fae5';
+                                                        }
+                                                    }}
+                                                    onMouseOut={(e) => {
+                                                        e.currentTarget.style.color = sub.active ? '#cbd5e1' : '#10b981';
+                                                        e.currentTarget.style.backgroundColor = sub.active ? 'transparent' : '#ecfdf5';
+                                                    }}
+                                                    title={sub.active ? "Desactivar" : "Activar"}
+                                                >
+                                                    <Power size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteSubcategory(sub.id, sub.name)}
+                                                    style={{
+                                                        padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer', transition: 'all 0.2s',
+                                                        color: '#cbd5e1',
+                                                        backgroundColor: 'transparent',
+                                                    }}
+                                                    onMouseOver={(e) => {
                                                         e.currentTarget.style.color = '#dc2626';
                                                         e.currentTarget.style.backgroundColor = '#fef2f2';
-                                                    } else {
-                                                        e.currentTarget.style.backgroundColor = '#d1fae5';
-                                                    }
-                                                }}
-                                                onMouseOut={(e) => {
-                                                    e.currentTarget.style.color = sub.active ? '#cbd5e1' : '#10b981';
-                                                    e.currentTarget.style.backgroundColor = sub.active ? 'transparent' : '#ecfdf5';
-                                                }}
-                                                title={sub.active ? "Desactivar" : "Activar"}
-                                            >
-                                                <Power size={18} />
-                                            </button>
+                                                    }}
+                                                    onMouseOut={(e) => {
+                                                        e.currentTarget.style.color = '#cbd5e1';
+                                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                                    }}
+                                                    title="Eliminar Subcategoría"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>

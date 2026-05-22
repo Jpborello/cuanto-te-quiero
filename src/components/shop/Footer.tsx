@@ -1,7 +1,27 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+const capitalizeWords = (str: string) => {
+    return str.toLowerCase().replace(/(?:^|\s)\S/g, function (a) { return a.toUpperCase(); });
+};
 
 export default function Footer() {
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+
+    useEffect(() => {
+        supabase
+            .from("categories")
+            .select("id, name")
+            .eq("active", true)
+            .order("name", { ascending: true })
+            .then(({ data }) => {
+                if (data) setCategories(data);
+            });
+    }, []);
     return (
         <footer style={{
             backgroundColor: '#fafafa',
@@ -73,33 +93,25 @@ export default function Footer() {
                             flexDirection: 'column',
                             gap: '0.75rem'
                         }}>
-                            <Link href="/categoria/mundo-bebe" style={{
-                                color: '#666',
-                                fontSize: '0.875rem',
-                                textDecoration: 'none',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                Mundo Bebé
-                            </Link>
-                            <Link href="/categoria/dulce-espera" style={{
-                                color: '#666',
-                                fontSize: '0.875rem',
-                                textDecoration: 'none',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                Dulce Espera
-                            </Link>
-                            <Link href="/categoria/regaleria" style={{
-                                color: '#666',
-                                fontSize: '0.875rem',
-                                textDecoration: 'none',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                Regalería
-                            </Link>
+                            {categories.map((cat) => {
+                                const slug = cat.name.toLowerCase().replace(/\s+/g, '-');
+                                return (
+                                    <Link
+                                        key={cat.id}
+                                        href={`/categoria/${slug}`}
+                                        style={{
+                                            color: '#666',
+                                            fontSize: '0.875rem',
+                                            textDecoration: 'none',
+                                            transition: 'color 0.2s'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
+                                        onMouseOut={(e) => e.currentTarget.style.color = '#666'}
+                                    >
+                                        {capitalizeWords(cat.name)}
+                                    </Link>
+                                );
+                            })}
                             <Link href="/ofertas" style={{
                                 color: '#666',
                                 fontSize: '0.875rem',
@@ -210,7 +222,7 @@ export default function Footer() {
                                 fontSize: '0.875rem'
                             }}>
                                 <MapPin size={16} style={{ marginTop: '0.2rem' }} />
-                                <span>Mendoza 6378 - Santa Fe, Rosario</span>
+                                <span>Mendoza 6378 - Rosario, Santa Fe</span>
                             </div>
                         </div>
                     </div>
