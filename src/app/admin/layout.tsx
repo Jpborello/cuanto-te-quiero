@@ -1,3 +1,5 @@
+import "@/app/admin/admin.css";
+
 export default function AdminRootLayout({
     children,
 }: {
@@ -5,3 +7,4 @@ export default function AdminRootLayout({
 }) {
     return <>{children}</>;
 }
+

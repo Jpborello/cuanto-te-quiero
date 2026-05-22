@@ -34,47 +34,47 @@ export default function AdminLogin() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[var(--pastel-pink)] p-4">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-                <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-[var(--brand-brown)] mb-2">
+        <div className="login-bg">
+            <div className="login-card animate-in fade-in zoom-in-95 duration-300">
+                <div className="login-header">
+                    <h1 className="login-title">
                         Bienvenido
                     </h1>
-                    <p className="text-gray-500 text-sm">
+                    <p className="login-subtitle">
                         Ingresá tus credenciales para acceder al panel
                     </p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleLogin}>
                     {error && (
-                        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
+                        <div className="login-error">
                             {error}
                         </div>
                     )}
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="login-form-group">
+                        <label className="login-label">
                             Email
                         </label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--pastel-blue)] focus:border-transparent transition-all"
+                            className="login-input"
                             placeholder="admin@cuantotequiero.com"
                             required
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="login-form-group">
+                        <label className="login-label">
                             Contraseña
                         </label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--pastel-blue)] focus:border-transparent transition-all"
+                            className="login-input"
                             placeholder="••••••••"
                             required
                         />
@@ -83,7 +83,7 @@ export default function AdminLogin() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[var(--brand-brown)] text-white font-semibold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+                        className="login-btn"
                     >
                         {loading ? "Ingresando..." : "Ingresar"}
                     </button>
@@ -93,3 +93,4 @@ export default function AdminLogin() {
         </div>
     );
 }
+
