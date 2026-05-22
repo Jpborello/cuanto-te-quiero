@@ -25,7 +25,8 @@ export default function AdminLogin() {
 
             if (error) throw error;
 
-            router.push("/admin/dashboard");
+            window.location.href = "/admin/dashboard";
+
         } catch (err: any) {
             setError(err.message || "Error al iniciar sesión");
         } finally {
