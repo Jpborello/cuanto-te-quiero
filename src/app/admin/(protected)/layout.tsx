@@ -8,8 +8,9 @@ export default async function ProtectedAdminLayout({
     children: React.ReactNode;
 }) {
     const allowed = await isAdmin();
+    if (!allowed) redirect("/admin/login");
 
-    // if (!allowed) redirect("/admin/login");
+
 
     return (
         <>
