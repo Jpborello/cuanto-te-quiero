@@ -119,15 +119,6 @@ export default function Footer() {
                                     </Link>
                                 );
                             })}
-                            <Link href="/ofertas" style={{
-                                color: '#666',
-                                fontSize: '0.875rem',
-                                textDecoration: 'none',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                Ofertas
-                            </Link>
                         </nav>
                     </div>
 
