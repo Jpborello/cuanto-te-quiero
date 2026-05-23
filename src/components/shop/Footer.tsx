@@ -19,7 +19,14 @@ export default function Footer() {
             .eq("active", true)
             .order("name", { ascending: true })
             .then(({ data }) => {
-                if (data) setCategories(data);
+                if (data) {
+                    // Exclude "ofertas" and "general" case-insensitively
+                    const filtered = data.filter(cat => {
+                        const nameLower = cat.name.toLowerCase().trim();
+                        return nameLower !== "ofertas" && nameLower !== "general";
+                    });
+                    setCategories(filtered);
+                }
             });
     }, []);
     return (
