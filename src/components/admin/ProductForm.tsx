@@ -38,6 +38,7 @@ export default function ProductForm({ initialData, categories, subcategories }: 
         price: initialData?.price || "",
         stock: initialData?.stock || "",
         active: initialData?.active ?? true, // Default true
+        sort_order: initialData?.sort_order ?? "", // Sort order number
     });
 
     const [images, setImages] = useState<string[]>(
@@ -118,6 +119,7 @@ export default function ProductForm({ initialData, categories, subcategories }: 
                 price: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
                 active: formData.active,
+                sort_order: formData.sort_order !== "" ? parseInt(formData.sort_order.toString()) : null,
                 // El schema guarda las imágenes como un arreglo en el campo image_url
                 image_url: images.length > 0 ? images : null
             };
@@ -278,7 +280,7 @@ export default function ProductForm({ initialData, categories, subcategories }: 
                     </div>
                 </div>
 
-                <div className="field-row field-row-2">
+                <div className="field-row field-row-3">
                     <div className="field-group">
                         <label className="form-label form-label-required">Precio ($)</label>
                         <div className="relative">
@@ -309,6 +311,19 @@ export default function ProductForm({ initialData, categories, subcategories }: 
                             onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                         />
                         <p className="form-hint">Unidades en inventario</p>
+                    </div>
+
+                    <div className="field-group">
+                        <label className="form-label">Posición de Orden</label>
+                        <input
+                            type="number"
+                            min="1"
+                            className="form-input font-semibold text-lg"
+                            placeholder="Ej: 1"
+                            value={formData.sort_order}
+                            onChange={(e) => setFormData({ ...formData, sort_order: e.target.value })}
+                        />
+                        <p className="form-hint">Número menor aparece primero</p>
                     </div>
                 </div>
             </div>

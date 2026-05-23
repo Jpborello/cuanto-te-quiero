@@ -111,6 +111,7 @@ export default function SubcategoryPage() {
                 `)
                 .eq("subcategory_id", subcategoryData.id)
                 .eq("active", true)
+                .order("sort_order", { ascending: true, nullsFirst: false })
                 .order("code", { ascending: true });
 
             console.log('[DEBUG] Products query result:', { productsData, productsError });
