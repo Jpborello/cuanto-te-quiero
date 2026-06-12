@@ -40,7 +40,7 @@ export default function Home() {
                     </div>
 
                     {/* Categorías (Burbujas) */}
-                    <div className="categories-section" style={{ marginBottom: '6rem' }}>
+                    <div id="categorias" className="categories-section" style={{ marginBottom: '6rem' }}>
                         <CategoryBubbles />
                     </div>
 
@@ -61,7 +61,7 @@ export default function Home() {
                             }}>
                                 Novedades
                             </h3>
-                            <Link href="/productos" style={{
+                            <Link href="#categorias" style={{
                                 color: '#ff6b9d',
                                 fontWeight: '600',
                                 textDecoration: 'none',
@@ -70,7 +70,7 @@ export default function Home() {
                                 gap: '0.5rem',
                                 fontSize: '0.9rem'
                             }}>
-                                Ver todos <ArrowRight size={16} />
+                                Ver Categorías <ArrowRight size={16} />
                             </Link>
                         </div>
                         <ProductGrid limit={8} />
