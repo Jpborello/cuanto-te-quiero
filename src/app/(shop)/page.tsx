@@ -8,8 +8,6 @@ import FeaturedCarousel from "@/components/shop/FeaturedCarousel";
 import CategoryBubbles from "@/components/shop/CategoryBubbles";
 import Testimonials from "@/components/home/Testimonials";
 import WelcomeRaffleModal from "@/components/shop/WelcomeRaffleModal";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 export default function Home() {
     return (
@@ -61,17 +59,6 @@ export default function Home() {
                             }}>
                                 Novedades
                             </h3>
-                            <Link href="#categorias" style={{
-                                color: '#ff6b9d',
-                                fontWeight: '600',
-                                textDecoration: 'none',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                fontSize: '0.9rem'
-                            }}>
-                                Ver Categorías <ArrowRight size={16} />
-                            </Link>
                         </div>
                         <ProductGrid limit={8} />
                     </div>
