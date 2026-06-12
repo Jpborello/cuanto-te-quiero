@@ -411,9 +411,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                                  <button
                                      onClick={() => {
                                          if (product.stock > 0) {
-                                             const firstImage = product.images.length > 0 ? product.images[0] : '';
-                                             const absoluteImageUrl = firstImage ? (firstImage.startsWith('http') ? firstImage : `${window.location.origin}${firstImage}`) : '';
-                                             const message = `Hola! Me gustaría consultar por ${quantity > 1 ? `${quantity} unidades de` : 'el producto'}: ${product.name}${product.code ? ` (Código: ${product.code})` : ''}.\nLink: ${window.location.href}${absoluteImageUrl ? `\nImagen: ${absoluteImageUrl}` : ''}`;
+                                             const message = `Hola! Me gustaría consultar por ${quantity > 1 ? `${quantity} unidades de` : 'el producto'}: ${product.name}${product.code ? ` (Código: ${product.code})` : ''}.\nLink: ${window.location.href}`;
                                              const whatsappUrl = `https://wa.me/5493416029814?text=${encodeURIComponent(message)}`;
                                              window.open(whatsappUrl, '_blank');
                                          }

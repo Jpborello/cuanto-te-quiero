@@ -473,9 +473,7 @@ export default function SubcategoryPage() {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         if (product.stock > 0) {
-                                                            const firstImage = product.images && product.images.length > 0 ? product.images[0] : '';
-                                                            const absoluteImageUrl = firstImage ? (firstImage.startsWith('http') ? firstImage : `${window.location.origin}${firstImage}`) : '';
-                                                            const message = `Hola! Me gustaría consultar por el producto: ${product.name}${product.code ? ` (Código: ${product.code})` : ''}.\nLink: ${window.location.origin}/producto/${product.uid}${absoluteImageUrl ? `\nImagen: ${absoluteImageUrl}` : ''}`;
+                                                            const message = `Hola! Me gustaría consultar por el producto: ${product.name}${product.code ? ` (Código: ${product.code})` : ''}.\nLink: ${window.location.origin}/producto/${product.uid}`;
                                                             const whatsappUrl = `https://wa.me/5493416029814?text=${encodeURIComponent(message)}`;
                                                             window.open(whatsappUrl, '_blank');
                                                         }
