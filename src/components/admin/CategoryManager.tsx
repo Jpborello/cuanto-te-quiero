@@ -235,6 +235,31 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
         }
     };
 
+    const handleDeleteCategory = async (catId: string, catName: string) => {
+        if (!confirm(`¿Estás seguro de que deseas eliminar la categoría "${catName}"?`)) return;
+        setLoading(true);
+
+        try {
+            const response = await fetch("/api/categories", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: catId })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || "Error al eliminar la categoría");
+
+            setCategories(categories.filter(c => c.id !== catId));
+            router.refresh();
+        } catch (error: any) {
+            console.error("Error deleting category:", error);
+            alert(error.message || "Error al eliminar la categoría");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     return (
         <div className="space-y-6">
             {/* Create Category Button/Form */}
@@ -436,6 +461,29 @@ export default function CategoryManager({ initialCategories, initialSubcategorie
                                         title={cat.active ? "Desactivar" : "Activar"}
                                     >
                                         <Power size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteCategory(cat.id, cat.name)}
+                                        style={{
+                                            padding: '8px',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            color: '#94a3b8',
+                                            backgroundColor: 'transparent',
+                                            border: 'none'
+                                        }}
+                                        onMouseOver={(e) => {
+                                            e.currentTarget.style.color = '#dc2626';
+                                            e.currentTarget.style.backgroundColor = '#fef2f2';
+                                        }}
+                                        onMouseOut={(e) => {
+                                            e.currentTarget.style.color = '#94a3b8';
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                        }}
+                                        title="Eliminar Categoría"
+                                    >
+                                        <Trash2 size={18} />
                                     </button>
                                 </div>
                             </div>

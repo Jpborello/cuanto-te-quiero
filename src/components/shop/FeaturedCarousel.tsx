@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface Product {
     uid: string;
@@ -19,6 +20,7 @@ export default function FeaturedCarousel() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [loading, setLoading] = useState(true);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const { settings } = useStoreSettings();
 
     useEffect(() => {
         fetchFeaturedProducts();
@@ -189,23 +191,27 @@ export default function FeaturedCarousel() {
                     {shortName}
                 </h2>
 
-                {currentProduct.price > 0 ? (
-                    <p className="featured-price">
-                        ${currentProduct.price.toLocaleString('es-AR')}
-                    </p>
-                ) : (
-                    <p className="featured-price" style={{
-                        background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text'
-                    }}>
-                        Consultar precio
-                    </p>
+                {settings.prices_enabled && (
+                    currentProduct.price > 0 ? (
+                        <p className="featured-price">
+                            ${currentProduct.price.toLocaleString('es-AR')}
+                        </p>
+                    ) : (
+                        <p className="featured-price" style={{
+                            background: 'linear-gradient(135deg, #ffc0cb 0%, #ff6b9d 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                            fontFamily: 'var(--font-bubblegum)',
+                            letterSpacing: '0.5px'
+                        }}>
+                            Disponible
+                        </p>
+                    )
                 )}
 
                 <Link href={`/producto/${currentProduct.uid}`} className="featured-button">
-                    <ShoppingCart size={22} />
+                    <Eye size={22} />
                     Ver Detalles
                 </Link>
             </div>

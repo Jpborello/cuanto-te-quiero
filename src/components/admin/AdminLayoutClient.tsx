@@ -12,7 +12,8 @@ import {
     ShoppingCart,
     LogOut,
     Menu,
-    X
+    X,
+    Settings
 } from "lucide-react";
 import "@/app/admin/admin.css"; // Import standard CSS
 
@@ -36,6 +37,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         { href: "/admin/categories", label: "Categorías", icon: Layers },
         { href: "/admin/gift-cards", label: "Gift Cards", icon: Gift },
         { href: "/admin/orders", label: "Pedidos", icon: ShoppingCart },
+        { href: "/admin/settings", label: "Configuración", icon: Settings },
     ];
 
     return (

@@ -60,27 +60,67 @@ export default function Footer() {
                             color: '#666',
                             fontSize: '0.875rem',
                             lineHeight: '1.6',
-                            marginBottom: '1rem'
+                            marginBottom: '1.5rem'
                         }}>
                             Todo lo que tu bebé necesita, con el amor que se merece. Acompañamos cada etapa de tu dulce espera.
                         </p>
+                        <h4 style={{
+                            fontSize: '0.9rem',
+                            fontWeight: '700',
+                            color: '#333',
+                            marginBottom: '0.75rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px'
+                        }}>
+                            Seguinos en Redes
+                        </h4>
                         <div style={{
                             display: 'flex',
-                            gap: '1rem'
+                            gap: '0.75rem'
                         }}>
-                            <a href="https://www.instagram.com/cuanto_tequiero/" target="_blank" rel="noopener noreferrer" style={{
-                                color: '#666',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                <Instagram size={20} />
+                            <a 
+                                href="https://www.instagram.com/cuanto_tequiero/" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                                    color: 'white',
+                                    transition: 'transform 0.2s ease',
+                                    boxShadow: '0 4px 10px rgba(225, 48, 108, 0.2)'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                title="Instagram"
+                            >
+                                <Instagram size={22} />
                             </a>
-                            <a href="https://www.facebook.com/cuantotequieroCTQ" target="_blank" rel="noopener noreferrer" style={{
-                                color: '#666',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                <Facebook size={20} />
+                            <a 
+                                href="https://www.facebook.com/cuantotequieroCTQ" 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '40px',
+                                    height: '40px',
+                                    borderRadius: '50%',
+                                    background: '#1877F2',
+                                    color: 'white',
+                                    transition: 'transform 0.2s ease',
+                                    boxShadow: '0 4px 10px rgba(24, 119, 242, 0.2)'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                title="Facebook"
+                            >
+                                <Facebook size={22} />
                             </a>
                         </div>
                     </div>
@@ -155,24 +195,6 @@ export default function Footer() {
                                 onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
                                 Preguntas Frecuentes
                             </Link>
-                            <Link href="/envios" style={{
-                                color: '#666',
-                                fontSize: '0.875rem',
-                                textDecoration: 'none',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                Envíos
-                            </Link>
-                            <Link href="/cambios-devoluciones" style={{
-                                color: '#666',
-                                fontSize: '0.875rem',
-                                textDecoration: 'none',
-                                transition: 'color 0.2s'
-                            }} onMouseOver={(e) => e.currentTarget.style.color = '#ffc0cb'}
-                                onMouseOut={(e) => e.currentTarget.style.color = '#666'}>
-                                Cambios y Devoluciones
-                            </Link>
                         </nav>
                     </div>
 
@@ -222,8 +244,28 @@ export default function Footer() {
                                 <MapPin size={16} style={{ marginTop: '0.2rem' }} />
                                 <span>Mendoza 6378 - Rosario, Santa Fe</span>
                             </div>
+                            <div style={{
+                                width: '100%',
+                                height: '150px',
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                                border: '1px solid #e2e8f0',
+                                marginTop: '0.5rem'
+                            }}>
+                                <iframe
+                                    src="https://maps.google.com/maps?q=Mendoza%206378,%20Rosario,%20Santa%20Fe,%20Argentina&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen={false}
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                />
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Bottom Bar */}

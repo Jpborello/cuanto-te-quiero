@@ -8,6 +8,7 @@ import Footer from "@/components/shop/Footer";
 import AutoRotatingImage from "@/components/shop/AutoRotatingImage";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface Product {
     uid: string;
@@ -25,6 +26,7 @@ function SearchResults() {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+    const { settings } = useStoreSettings();
 
     useEffect(() => {
         if (query.trim().length < 2) {
@@ -198,7 +200,7 @@ function SearchResults() {
                                     {/* Imagen */}
                                     <div style={{
                                         width: "100%",
-                                        height: "240px",
+                                        aspectRatio: "1 / 1",
                                         backgroundColor: "#fafafa",
                                         overflow: "hidden",
                                         position: "relative",
@@ -254,9 +256,25 @@ function SearchResults() {
                                             {product.name}
                                         </h3>
                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <span style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#ffc0cb" }}>
-                                                {product.price > 0 ? `$${product.price.toLocaleString()}` : "Consultar"}
-                                            </span>
+                                             {settings.prices_enabled && (
+                                                 product.price > 0 ? (
+                                                     <span style={{ fontSize: "1.3rem", fontWeight: "bold", color: "#ffc0cb" }}>
+                                                         ${product.price.toLocaleString()}
+                                                     </span>
+                                                 ) : (
+                                                     <span style={{
+                                                         fontSize: "1.25rem",
+                                                         fontWeight: "bold",
+                                                         fontFamily: "var(--font-bubblegum)",
+                                                         background: "linear-gradient(135deg, #ffc0cb 0%, #ff6b9d 100%)",
+                                                         WebkitBackgroundClip: "text",
+                                                         WebkitTextFillColor: "transparent",
+                                                         backgroundClip: "text"
+                                                     }}>
+                                                         Disponible
+                                                     </span>
+                                                 )
+                                             )}
                                             <span style={{
                                                 fontSize: "0.75rem",
                                                 color: product.stock > 0 ? "#4caf50" : "#f44336",

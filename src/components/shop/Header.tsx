@@ -5,6 +5,7 @@ import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface Category {
     id: string;
@@ -13,6 +14,7 @@ interface Category {
 
 export default function Header() {
     const router = useRouter();
+    const { settings } = useStoreSettings();
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
     const [cartCount] = useState(0);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -273,36 +275,38 @@ export default function Header() {
                                 <User size={20} />
                             </button>
 
-                            <Link href="/carrito" style={{
-                                background: 'white',
-                                padding: '0.6rem',
-                                color: '#666',
-                                borderRadius: '50%',
-                                boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                position: 'relative'
-                            }}>
-                                <ShoppingCart size={20} />
-                                {cartCount > 0 && (
-                                    <span style={{
-                                        position: 'absolute',
-                                        top: -4,
-                                        right: -4,
-                                        background: '#ff6b9d',
-                                        color: 'white',
-                                        fontSize: '0.65rem',
-                                        fontWeight: 'bold',
-                                        padding: '0.1rem 0.3rem',
-                                        borderRadius: '10px',
-                                        minWidth: '16px',
-                                        textAlign: 'center'
-                                    }}>
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </Link>
+                            {settings.cart_enabled && (
+                                <Link href="/carrito" style={{
+                                    background: 'white',
+                                    padding: '0.6rem',
+                                    color: '#666',
+                                    borderRadius: '50%',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    position: 'relative'
+                                }}>
+                                    <ShoppingCart size={20} />
+                                    {cartCount > 0 && (
+                                        <span style={{
+                                            position: 'absolute',
+                                            top: -4,
+                                            right: -4,
+                                            background: '#ff6b9d',
+                                            color: 'white',
+                                            fontSize: '0.65rem',
+                                            fontWeight: 'bold',
+                                            padding: '0.1rem 0.3rem',
+                                            borderRadius: '10px',
+                                            minWidth: '16px',
+                                            textAlign: 'center'
+                                        }}>
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
