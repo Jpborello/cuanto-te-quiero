@@ -202,6 +202,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     <div style={{
                         display: 'flex',
                         alignItems: 'center',
+                        flexWrap: 'wrap',
                         gap: '0.5rem',
                         marginBottom: '2rem',
                         fontSize: '0.875rem',
@@ -223,12 +224,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                     </div>
 
                     {/* Product Content */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-                        gap: '4rem',
-                        marginBottom: '4rem'
-                    }}>
+                    <div className="product-detail-grid">
                         {/* Left: Gallery */}
                         <div>
                             <ProductGallery images={product.images} productName={product.name} />

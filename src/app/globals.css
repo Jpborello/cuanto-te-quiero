@@ -817,3 +817,21 @@ a {
         padding: 2rem 1rem;
     }
 }
+
+/* ============================================
+   PRODUCT DETAIL RESPONSIVE GRID
+   ============================================ */
+.product-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 4rem;
+    margin-bottom: 4rem;
+}
+
+@media (max-width: 768px) {
+    .product-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+}
