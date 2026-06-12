@@ -275,13 +275,15 @@ function SearchResults() {
                                                      </span>
                                                  )
                                              )}
-                                            <span style={{
-                                                fontSize: "0.75rem",
-                                                color: product.stock > 0 ? "#4caf50" : "#f44336",
-                                                fontWeight: "500"
-                                            }}>
-                                                {product.stock > 0 ? "En stock" : "Sin stock"}
-                                            </span>
+                                             {settings.prices_enabled && (
+                                                 <span style={{
+                                                     fontSize: "0.75rem",
+                                                     color: product.stock > 0 ? "#4caf50" : "#f44336",
+                                                     fontWeight: "500"
+                                                 }}>
+                                                     {product.stock > 0 ? "En stock" : "Sin stock"}
+                                                 </span>
+                                             )}
                                         </div>
                                     </div>
                                 </div>

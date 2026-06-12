@@ -7,12 +7,14 @@ import ProductGrid from "@/components/shop/ProductGrid";
 import FeaturedCarousel from "@/components/shop/FeaturedCarousel";
 import CategoryBubbles from "@/components/shop/CategoryBubbles";
 import Testimonials from "@/components/home/Testimonials";
+import WelcomeRaffleModal from "@/components/shop/WelcomeRaffleModal";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 export default function Home() {
     return (
         <>
+            <WelcomeRaffleModal />
             <Header />
             <main className="min-h-screen">
                 <div className="hero-wrapper">

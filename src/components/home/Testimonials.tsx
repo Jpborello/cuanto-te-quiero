@@ -14,8 +14,8 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
     {
         id: 1,
-        quote: "Quiero por la atención desde el minuto cero, por el asesoramiento y recomendación. Por dar la posibilidad de guardar los muebles hasta qe uno puede recibirlos. Me encantó lo que ofrecen así qe obviamente seguiré comprando y recomendaré. 🙌🏼",
-        author: "Lorena Chira Samamé",
+        quote: "Quiero agradecer la atención desde el minuto cero, por el asesoramiento y recomendación. Por dar la posibilidad de guardar los muebles hasta que uno pueda recibirlos. Me encantó lo que ofrecen así que obviamente seguiré comprando y recomendaré. 🙌🏼",
+        author: "Lorena C.",
         role: "Opinión en Google",
         date: "Hace 2 días",
         stars: 5

@@ -13,7 +13,8 @@ import {
     LogOut,
     Menu,
     X,
-    Settings
+    Settings,
+    Ticket
 } from "lucide-react";
 import "@/app/admin/admin.css"; // Import standard CSS
 
@@ -37,6 +38,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
         { href: "/admin/categories", label: "Categorías", icon: Layers },
         { href: "/admin/gift-cards", label: "Gift Cards", icon: Gift },
         { href: "/admin/orders", label: "Pedidos", icon: ShoppingCart },
+        { href: "/admin/sorteo", label: "Sorteo", icon: Ticket },
         { href: "/admin/settings", label: "Configuración", icon: Settings },
     ];
 

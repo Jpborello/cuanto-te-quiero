@@ -242,18 +242,20 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                                     )
                                 )}
                             </div>
-                            <div style={{
-                                fontSize: '0.75rem',
-                                color: 'white',
-                                backgroundColor: product.stock > 0 ? '#4caf50' : '#f44336',
-                                fontWeight: '600',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '12px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.5px'
-                            }}>
-                                {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
-                            </div>
+                            {settings.prices_enabled && (
+                                <div style={{
+                                    fontSize: '0.75rem',
+                                    color: 'white',
+                                    backgroundColor: product.stock > 0 ? '#4caf50' : '#f44336',
+                                    fontWeight: '600',
+                                    padding: '0.25rem 0.75rem',
+                                    borderRadius: '12px',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px'
+                                }}>
+                                    {product.stock > 0 ? `Stock: ${product.stock}` : 'Agotado'}
+                                </div>
+                            )}
                         </div>
 
                         {/* Action Button: Cart or WhatsApp */}

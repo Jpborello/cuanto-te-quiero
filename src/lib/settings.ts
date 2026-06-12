@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 export interface StoreSettings {
     cart_enabled: boolean;
     prices_enabled: boolean;
+    raffle_enabled: boolean;
 }
 
 export async function getStoreSettings(): Promise<StoreSettings> {
@@ -15,7 +16,8 @@ export async function getStoreSettings(): Promise<StoreSettings> {
             // Default fallback if table doesn't exist
             return {
                 cart_enabled: false,
-                prices_enabled: true
+                prices_enabled: true,
+                raffle_enabled: false
             };
         }
 
@@ -34,13 +36,15 @@ export async function getStoreSettings(): Promise<StoreSettings> {
 
         return {
             cart_enabled: parseBool(settingsMap.cart_enabled, false),
-            prices_enabled: parseBool(settingsMap.prices_enabled, true)
+            prices_enabled: parseBool(settingsMap.prices_enabled, true),
+            raffle_enabled: parseBool(settingsMap.raffle_enabled, false)
         };
     } catch (e) {
         console.error("Error reading store settings:", e);
         return {
             cart_enabled: false,
-            prices_enabled: true
+            prices_enabled: true,
+            raffle_enabled: false
         };
     }
 }

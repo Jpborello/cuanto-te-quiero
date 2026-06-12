@@ -281,19 +281,21 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                              )}
 
                             {/* Stock Badge */}
-                            <div style={{ marginBottom: '2rem' }}>
-                                <span style={{
-                                    display: 'inline-block',
-                                    padding: '0.5rem 1rem',
-                                    borderRadius: '20px',
-                                    fontSize: '0.875rem',
-                                    fontWeight: '600',
-                                    backgroundColor: product.stock > 0 ? '#e8f5e9' : '#ffebee',
-                                    color: product.stock > 0 ? '#4caf50' : '#f44336'
-                                }}>
-                                    {product.stock > 0 ? `✓ En stock (${product.stock} disponibles)` : '✕ Sin stock'}
-                                </span>
-                            </div>
+                            {settings.prices_enabled && (
+                                <div style={{ marginBottom: '2rem' }}>
+                                    <span style={{
+                                        display: 'inline-block',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '20px',
+                                        fontSize: '0.875rem',
+                                        fontWeight: '600',
+                                        backgroundColor: product.stock > 0 ? '#e8f5e9' : '#ffebee',
+                                        color: product.stock > 0 ? '#4caf50' : '#f44336'
+                                    }}>
+                                        {product.stock > 0 ? `✓ En stock (${product.stock} disponibles)` : '✕ Sin stock'}
+                                    </span>
+                                </div>
+                            )}
 
                             {/* Description */}
                             {product.description && (

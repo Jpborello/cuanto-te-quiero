@@ -413,13 +413,15 @@ export default function SubcategoryPage() {
                                                         )
                                                     )}
                                                 </div>
-                                                <div style={{
-                                                    fontSize: '0.75rem',
-                                                    color: product.stock > 0 ? '#4caf50' : '#f44336',
-                                                    fontWeight: '500'
-                                                }}>
-                                                    {product.stock > 0 ? `Stock: ${product.stock}` : 'Sin stock'}
-                                                </div>
+                                                {settings.prices_enabled && (
+                                                    <div style={{
+                                                        fontSize: '0.75rem',
+                                                        color: product.stock > 0 ? '#4caf50' : '#f44336',
+                                                        fontWeight: '500'
+                                                    }}>
+                                                        {product.stock > 0 ? `Stock: ${product.stock}` : 'Sin stock'}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Action Button: Cart or WhatsApp */}
