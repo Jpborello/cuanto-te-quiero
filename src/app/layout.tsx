@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Bubblegum_Sans } from "next/font/google"; // Import Bubblegum Sans
 import "./globals.css";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 const bubblegumSans = Bubblegum_Sans({
@@ -84,6 +85,21 @@ export default function RootLayout({
     return (
         <html lang="es" suppressHydrationWarning>
             <body className={`${inter.className} ${bubblegumSans.variable}`} suppressHydrationWarning>
+                {/* Google Analytics */}
+                <Script
+                    src="https://www.googletagmanager.com/gtag/js?id=G-P0C6MXS8VZ"
+                    strategy="afterInteractive"
+                />
+                <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+
+                        gtag('config', 'G-P0C6MXS8VZ');
+                    `}
+                </Script>
+
                 {/* JSON-LD de Google Local Business */}
                 <script
                     type="application/ld+json"
