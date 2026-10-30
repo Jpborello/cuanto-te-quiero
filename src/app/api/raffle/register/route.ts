@@ -13,8 +13,11 @@ export async function POST(req: NextRequest) {
         }
 
         // Basic validations
-        if (typeof name !== "string" || !name.trim() || name.trim().length > 100) {
+        if (typeof name !== "string" || !name.trim()) {
             return NextResponse.json({ error: "El nombre es obligatorio" }, { status: 400 });
+        }
+        if (name.trim().length > 100) {
+            return NextResponse.json({ error: "El nombre es demasiado largo" }, { status: 400 });
         }
         if (typeof dni !== "string" || !/^\d{7,8}$/.test(dni.trim())) {
             return NextResponse.json({ error: "El DNI debe tener 7 u 8 dígitos numéricos" }, { status: 400 });
