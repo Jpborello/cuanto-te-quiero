@@ -62,7 +62,8 @@ export default function AutoRotatingImage({ images, alt, interval = 3000 }: Auto
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
+                        // contain: product photos carry text/composition, never crop them
+                        objectFit: 'contain',
                         opacity: index === currentIndex ? 1 : 0,
                         transition: 'opacity 0.8s ease-in-out',
                         display: 'block'
