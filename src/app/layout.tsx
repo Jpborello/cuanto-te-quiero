@@ -11,6 +11,7 @@ const bubblegumSans = Bubblegum_Sans({
 });
 
 export const metadata: Metadata = {
+    metadataBase: new URL("https://www.cuantotequiero.com.ar"),
     title: "Cuanto Te Quiero | Muebles, Blanquería e Indumentaria Infantil en Rosario",
     description: "Descubrí en Cuanto Te Quiero los mejores muebles infantiles, cunas, blanquería y accesorios para tu bebé. Acompañamos cada etapa de tu dulce espera con atención personalizada en Rosario.",
     keywords: ["muebles infantiles rosario", "cunas funcionales rosario", "cochecitos de bebe rosario", "ropa de bebe rosario", "blanqueria infantil rosario", "cuanto te quiero rosario", "cuna colecho rosario"],
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Cuanto Te Quiero | Muebles y Artículos Infantiles en Rosario",
         description: "Todo lo que tu bebé necesita, con el amor que se merece. Cunas funcionales, cochecitos, blanquería y asesoramiento cálido y familiar.",
-        url: "https://cuantotequiero.com.ar",
+        url: "https://www.cuantotequiero.com.ar",
         siteName: "Cuanto Te Quiero",
         locale: "es_AR",
         type: "website",
@@ -45,9 +46,9 @@ export default function RootLayout({
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "Cuanto Te Quiero",
-        "image": "https://cuantotequiero.com.ar/logo.png",
-        "@id": "https://cuantotequiero.com.ar/#localbusiness",
-        "url": "https://cuantotequiero.com.ar",
+        "image": "https://www.cuantotequiero.com.ar/images/IMG-Hero.png",
+        "@id": "https://www.cuantotequiero.com.ar/#localbusiness",
+        "url": "https://www.cuantotequiero.com.ar",
         "telephone": "+5493416029814",
         "priceRange": "$$",
         "address": {

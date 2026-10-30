@@ -12,7 +12,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { subslug } = await params;
+    const { slug, subslug } = await params;
 
     // Convert subslug back to name format for DB query (replaces hyphens with spaces)
     const dbQueryName = subslug.replace(/-/g, ' ');
@@ -29,6 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
         title: `${name} | Cuanto Te Quiero`,
         description: `Encontrá ${name} en Rosario. Te ofrecemos productos infantiles, cunas y accesorios hechos con amor para el bienestar de tu bebé.`,
+        alternates: {
+            canonical: `/categoria/${slug}/${subslug}`,
+        },
         openGraph: {
             title: `${name} | Cuanto Te Quiero`,
             description: `Encontrá ${name} en Rosario. Te ofrecemos productos infantiles, cunas y accesorios hechos con amor para el bienestar de tu bebé.`,

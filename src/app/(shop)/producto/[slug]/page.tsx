@@ -47,6 +47,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
         title: `${product.name} | Cuanto Te Quiero`,
         description: product.description || "Todo lo que tu bebé necesita, con el amor que se merece.",
+        alternates: {
+            canonical: `/producto/${slug}`,
+        },
         openGraph: {
             title: product.name,
             description: product.description || "Todo lo que tu bebé necesita, con el amor que se merece.",
@@ -67,6 +70,14 @@ export default async function Page({ params }: Props) {
         .eq(isUuid ? "uid" : "code", slug)
         .eq("active", true)
         .maybeSingle();
+
+    // Only expose the price to search engines when the store shows prices
+    const { data: pricesSetting } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "prices_enabled")
+        .maybeSingle();
+    const pricesEnabled = pricesSetting?.value !== false && pricesSetting?.value !== "false";
 
     let jsonLd = null;
 
@@ -93,19 +104,20 @@ export default async function Page({ params }: Props) {
             "description": product.description || "Todo lo que tu bebé necesita, con el amor que se merece.",
             "sku": product.code || product.uid,
             "mpn": product.code || product.uid,
-            "offers": {
-                "@type": "Offer",
-                "url": `https://cuantotequiero.com.ar/producto/${slug}`,
-                "priceCurrency": "ARS",
-                "price": product.price || 0,
-                "priceValidUntil": "2027-12-31",
-                "itemCondition": "https://schema.org/NewCondition",
-                "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-                "seller": {
-                    "@type": "LocalBusiness",
-                    "name": "Cuanto Te Quiero"
+            ...(pricesEnabled && product.price > 0 && {
+                "offers": {
+                    "@type": "Offer",
+                    "url": `https://www.cuantotequiero.com.ar/producto/${slug}`,
+                    "priceCurrency": "ARS",
+                    "price": product.price,
+                    "itemCondition": "https://schema.org/NewCondition",
+                    "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                    "seller": {
+                        "@type": "LocalBusiness",
+                        "name": "Cuanto Te Quiero"
+                    }
                 }
-            }
+            })
         };
     }
 

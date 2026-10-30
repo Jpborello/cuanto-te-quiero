@@ -29,6 +29,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return {
         title: `${name} | Cuanto Te Quiero`,
         description: `Descubrí nuestra colección de ${name} en Rosario. Los mejores productos infantiles, cunas y accesorios con atención personalizada.`,
+        alternates: {
+            canonical: `/categoria/${slug}`,
+        },
         openGraph: {
             title: `${name} | Cuanto Te Quiero`,
             description: `Descubrí nuestra colección de ${name} en Rosario. Los mejores productos infantiles, cunas y accesorios con atención personalizada.`,

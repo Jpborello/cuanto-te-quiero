@@ -1,18 +1,11 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-
 export default function ShopLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     return (
-        <>
-            <Header />
-            <div className="main-content">
-                {children}
-            </div>
-            <Footer />
-        </>
+        <div className="main-content">
+            {children}
+        </div>
     );
 }

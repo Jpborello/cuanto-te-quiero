@@ -9,7 +9,7 @@ const supabase = createClient(
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = "https://cuantotequiero.com.ar";
+    const baseUrl = "https://www.cuantotequiero.com.ar";
 
     // 1. Static Routes
     const staticPaths = [
@@ -64,12 +64,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // 3. Fetch products from DB
         const { data: products } = await supabase
             .from("products")
-            .select("code, updated_at")
+            .select("uid, created_at")
             .eq("active", true);
 
+        // Use uid: codes are not unique, and the shop links products by uid
         const productRoutes = (products || []).map((prod) => ({
-            url: `${baseUrl}/producto/${prod.code}`,
-            lastModified: prod.updated_at ? new Date(prod.updated_at) : new Date(),
+            url: `${baseUrl}/producto/${prod.uid}`,
+            lastModified: prod.created_at ? new Date(prod.created_at) : new Date(),
             changeFrequency: "weekly" as const,
             priority: 0.5,
         }));
