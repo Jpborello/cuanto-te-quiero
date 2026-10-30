@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { thumbUrl } from "@/lib/images";
 
 interface AutoRotatingImageProps {
     images: string[];
@@ -51,8 +52,10 @@ export default function AutoRotatingImage({ images, alt, interval = 3000 }: Auto
             {validImages.map((img, index) => (
                 <img
                     key={index}
-                    src={img}
+                    src={thumbUrl(img)}
                     alt={`${alt} - vista ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
                     style={{
                         position: index === 0 ? 'relative' : 'absolute',
                         top: 0,

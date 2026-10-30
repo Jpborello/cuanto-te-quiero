@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Package } from "lucide-react";
+import { thumbUrl } from "@/lib/images";
 
 interface ProductGalleryProps {
     images: string[];
@@ -118,8 +119,10 @@ export default function ProductGallery({ images, productName }: ProductGalleryPr
                             }}
                         >
                             <img
-                                src={image}
+                                src={thumbUrl(image)}
                                 alt={`${productName} - miniatura ${index + 1}`}
+                                loading="lazy"
+                                decoding="async"
                                 style={{
                                     maxWidth: '100%',
                                     maxHeight: '100%',

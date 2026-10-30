@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { createImageVariants } from "@/lib/optimizeUpload";
 import { Loader2, Save, Upload, X, Image as ImageIcon, Package, DollarSign, Tag, FileText, Sparkles } from "lucide-react";
 import Link from "next/link";
 
@@ -62,16 +63,35 @@ export default function ProductForm({ initialData, categories, subcategories }: 
 
         setUploading(true);
         const file = e.target.files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
-        const filePath = `products/${fileName}`;
 
         try {
-            const { error: uploadError } = await supabase.storage
-                .from('products')
-                .upload(filePath, file);
+            // Preferred: upload light WebP variants (same naming as scripts/optimize-images.mjs)
+            const variants = await createImageVariants(file);
+            let filePath: string;
 
-            if (uploadError) throw uploadError;
+            if (variants) {
+                const id = crypto.randomUUID().replace(/-/g, '').slice(0, 20);
+                const uploads: [string, Blob, string][] = [
+                    [`optimized/${id}-1200.webp`, variants.full, 'image/webp'],
+                    [`optimized/${id}-400.webp`, variants.thumb, 'image/webp'],
+                    [`optimized/${id}-og.jpg`, variants.og, 'image/jpeg'],
+                ];
+                for (const [path, blob, contentType] of uploads) {
+                    const { error } = await supabase.storage
+                        .from('products')
+                        .upload(path, blob, { contentType, cacheControl: '31536000' });
+                    if (error) throw error;
+                }
+                filePath = uploads[0][0];
+            } else {
+                // GIFs, or browsers that can't encode WebP: upload the original as before
+                const fileExt = file.name.split('.').pop();
+                filePath = `products/${Math.random()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage
+                    .from('products')
+                    .upload(filePath, file);
+                if (uploadError) throw uploadError;
+            }
 
             const { data } = supabase.storage.from('products').getPublicUrl(filePath);
 

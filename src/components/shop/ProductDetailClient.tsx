@@ -4,6 +4,7 @@ import { useState } from "react";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import ProductGallery from "@/components/shop/ProductGallery";
+import { thumbUrl } from "@/lib/images";
 import Link from "next/link";
 import { ChevronRight, Minus, Plus, ShoppingCart, Package } from "lucide-react";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
@@ -363,8 +364,10 @@ export default function ProductDetailClient({ product, relatedProducts }: { prod
                                                 {relatedProduct.images && relatedProduct.images.length > 0 ? (
                                                     <>
                                                         <img
-                                                            src={relatedProduct.images[0]}
+                                                            src={thumbUrl(relatedProduct.images[0])}
                                                             alt={relatedProduct.name}
+                                                            loading="lazy"
+                                                            decoding="async"
                                                             style={{
                                                                 width: '100%',
                                                                 height: '100%',
