@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FolderOpen } from "lucide-react";
+import { thumbUrl } from "@/lib/images";
 
 interface ImageCarouselProps {
     images: string[] | null;
@@ -72,8 +73,10 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
                     }}
                 >
                     <img
-                        src={image}
+                        src={thumbUrl(image)}
                         alt={`${alt} - imagen ${index + 1}`}
+                        loading="lazy"
+                        decoding="async"
                         style={{
                             maxWidth: '100%',
                             maxHeight: '100%',

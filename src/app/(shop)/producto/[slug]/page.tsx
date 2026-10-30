@@ -9,6 +9,7 @@ import {
     getStorePricesEnabled,
     slugify,
 } from "@/lib/catalog";
+import { ogImageUrl } from "@/lib/images";
 
 interface Props {
     params: Promise<{ slug: string }>;
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title: product.name,
             description,
-            images: product.images[0] ? [product.images[0]] : undefined,
+            images: product.images[0] ? [ogImageUrl(product.images[0])] : undefined,
             type: "website",
         },
     };

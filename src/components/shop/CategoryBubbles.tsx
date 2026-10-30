@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { Image as ImageIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { thumbUrl } from "@/lib/images";
 
 interface BubbleData {
     id: string;
@@ -186,7 +187,7 @@ export default function CategoryBubbles() {
                                 <div className="category-bubble">
                                     {bubble.image_url ? (
                                         <img
-                                            src={bubble.image_url}
+                                            src={thumbUrl(bubble.image_url)}
                                             alt={bubble.name}
                                             style={{
                                                 width: "100%",
