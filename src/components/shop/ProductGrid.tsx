@@ -139,7 +139,7 @@ export default function ProductGrid({ limit, initialProducts }: ProductGridProps
                     {/* Image */}
                     <div style={{
                         width: '100%',
-                        aspectRatio: '1 / 1',
+                        aspectRatio: '4 / 5', // most product photos are 4:5 (Instagram format)
                         backgroundColor: '#fafafa',
                         display: 'flex',
                         alignItems: 'center',
