@@ -1,11 +1,7 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import CategoryClient from "./CategoryClient";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { breadcrumbJsonLd, getCategoryBySlug, getSubcategoriesWithImages, slugify } from "@/lib/catalog";
 
 interface Props {
     params: Promise<{ slug: string }>;
@@ -13,30 +9,52 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
+    const category = await getCategoryBySlug(slug);
 
-    // Convert slug back to name format for DB query (replaces hyphens with spaces)
-    const dbQueryName = slug.replace(/-/g, ' ');
+    if (!category) {
+        return { title: "Categoría no encontrada | Cuanto Te Quiero", robots: { index: false } };
+    }
 
-    // Fetch the category name from Supabase case-insensitively
-    const { data: category } = await supabase
-        .from("categories")
-        .select("name")
-        .ilike("name", dbQueryName)
-        .maybeSingle();
-
-    const name = category?.name || slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    const name = category.name;
+    const description = `Descubrí nuestra colección de ${name.toLowerCase()} en Rosario. Los mejores productos infantiles, cunas y accesorios con atención personalizada.`;
 
     return {
         title: `${name} | Cuanto Te Quiero`,
-        description: `Descubrí nuestra colección de ${name} en Rosario. Los mejores productos infantiles, cunas y accesorios con atención personalizada.`,
+        description,
+        alternates: {
+            canonical: `/categoria/${slugify(name)}`,
+        },
         openGraph: {
             title: `${name} | Cuanto Te Quiero`,
-            description: `Descubrí nuestra colección de ${name} en Rosario. Los mejores productos infantiles, cunas y accesorios con atención personalizada.`,
+            description,
             type: "website",
         }
     };
 }
 
-export default async function Page() {
-    return <CategoryClient />;
+export default async function Page({ params }: Props) {
+    const { slug } = await params;
+    const category = await getCategoryBySlug(slug);
+
+    if (!category) {
+        notFound();
+    }
+
+    const subcategories = await getSubcategoriesWithImages(category.id);
+    const categoryPath = `/categoria/${slugify(category.name)}`;
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(breadcrumbJsonLd([
+                        { name: "Inicio", path: "" },
+                        { name: category.name, path: categoryPath },
+                    ]))
+                }}
+            />
+            <CategoryClient category={category} subcategories={subcategories} />
+        </>
+    );
 }

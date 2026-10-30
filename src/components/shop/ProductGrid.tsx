@@ -21,16 +21,17 @@ interface Product {
 
 interface ProductGridProps {
     limit?: number; // Número máximo de productos a mostrar
+    initialProducts?: Product[]; // Cargados en el servidor (home)
 }
 
-export default function ProductGrid({ limit }: ProductGridProps) {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function ProductGrid({ limit, initialProducts }: ProductGridProps) {
+    const [products, setProducts] = useState<Product[]>(initialProducts || []);
+    const [loading, setLoading] = useState(!initialProducts);
     const { settings } = useStoreSettings();
 
     useEffect(() => {
-        fetchProducts();
-    }, [limit]);
+        if (!initialProducts) fetchProducts();
+    }, [limit, initialProducts]);
 
     const fetchProducts = async () => {
         try {
@@ -203,7 +204,9 @@ export default function ProductGrid({ limit }: ProductGridProps) {
                             minHeight: '2.5rem',
                             lineHeight: '1.25rem'
                         }}>
-                            {product.name}
+                            <Link href={`/producto/${product.uid}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                {product.name}
+                            </Link>
                         </h3>
 
                         {/* Price and Stock */}

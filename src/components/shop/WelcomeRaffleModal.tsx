@@ -10,6 +10,7 @@ export default function WelcomeRaffleModal() {
     const [name, setName] = useState("");
     const [dni, setDni] = useState("");
     const [phone, setPhone] = useState("");
+    const [website, setWebsite] = useState("");
     const [acceptTerms, setAcceptTerms] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [isIncognito, setIsIncognito] = useState(false);
@@ -83,7 +84,7 @@ export default function WelcomeRaffleModal() {
             const response = await fetch("/api/raffle/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, dni, phone })
+                body: JSON.stringify({ name, dni, phone, website })
             });
 
             const result = await response.json();
@@ -231,6 +232,17 @@ export default function WelcomeRaffleModal() {
                             )}
 
                             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                                {/* Honeypot anti-bots: oculto para personas */}
+                                <input
+                                    type="text"
+                                    name="website"
+                                    value={website}
+                                    onChange={e => setWebsite(e.target.value)}
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                    aria-hidden="true"
+                                    style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                                />
                                 <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
                                     <label style={{ fontSize: "0.75rem", fontWeight: "bold", color: "#475569" }}>Nombre y Apellido</label>
                                     <div style={{ position: "relative" }}>

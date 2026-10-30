@@ -10,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
                 "/api/",
             ],
         },
-        sitemap: "https://cuantotequiero.com.ar/sitemap.xml",
+        sitemap: "https://www.cuantotequiero.com.ar/sitemap.xml",
     };
 }

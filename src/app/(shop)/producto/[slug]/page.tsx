@@ -1,56 +1,50 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import ProductDetailClient from "@/components/shop/ProductDetailClient";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import {
+    SITE_URL,
+    breadcrumbJsonLd,
+    getProduct,
+    getRelatedProducts,
+    getStorePricesEnabled,
+    slugify,
+} from "@/lib/catalog";
 
 interface Props {
     params: Promise<{ slug: string }>;
 }
 
+const DEFAULT_DESCRIPTION = "Todo lo que tu bebé necesita, con el amor que se merece.";
+
+function describe(product: { name: string; description?: string | null; categories?: { name: string } | null }) {
+    if (product.description?.trim()) return product.description.trim().slice(0, 300);
+    const category = product.categories?.name ? ` de ${product.categories.name.toLowerCase()}` : "";
+    return `${product.name}${category} en Cuanto Te Quiero, Rosario. Consultanos por WhatsApp.`;
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
-    
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slug);
-    
-    const { data: product } = await supabase
-        .from("products")
-        .select("name, description, image_url, code")
-        .eq(isUuid ? "uid" : "code", slug)
-        .eq("active", true)
-        .maybeSingle();
+    const product = await getProduct(slug);
 
     if (!product) {
         return {
             title: "Producto no encontrado | Cuanto Te Quiero",
+            robots: { index: false },
         };
     }
 
-    // Get first image URL
-    let imageUrl = "";
-    if (product.image_url) {
-        if (Array.isArray(product.image_url)) {
-            imageUrl = product.image_url[0] || "";
-        } else if (typeof product.image_url === "string") {
-            try {
-                const parsed = JSON.parse(product.image_url);
-                imageUrl = Array.isArray(parsed) ? (parsed[0] || "") : product.image_url;
-            } catch {
-                imageUrl = product.image_url;
-            }
-        }
-    }
+    const description = describe(product);
 
     return {
         title: `${product.name} | Cuanto Te Quiero`,
-        description: product.description || "Todo lo que tu bebé necesita, con el amor que se merece.",
+        description,
+        alternates: {
+            canonical: `/producto/${product.uid}`,
+        },
         openGraph: {
             title: product.name,
-            description: product.description || "Todo lo que tu bebé necesita, con el amor que se merece.",
-            images: imageUrl ? [imageUrl] : [],
+            description,
+            images: product.images[0] ? [product.images[0]] : undefined,
             type: "website",
         },
     };
@@ -58,47 +52,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
     const { slug } = await params;
+    const product = await getProduct(slug);
 
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slug);
+    if (!product) {
+        notFound();
+    }
 
-    const { data: product } = await supabase
-        .from("products")
-        .select("name, description, image_url, code, price, stock, uid")
-        .eq(isUuid ? "uid" : "code", slug)
-        .eq("active", true)
-        .maybeSingle();
+    const [relatedProducts, pricesEnabled] = await Promise.all([
+        getRelatedProducts(product.subcategories?.id, product.uid),
+        getStorePricesEnabled(),
+    ]);
 
-    let jsonLd = null;
-
-    if (product) {
-        let imageUrl = "";
-        if (product.image_url) {
-            if (Array.isArray(product.image_url)) {
-                imageUrl = product.image_url[0] || "";
-            } else if (typeof product.image_url === "string") {
-                try {
-                    const parsed = JSON.parse(product.image_url);
-                    imageUrl = Array.isArray(parsed) ? (parsed[0] || "") : product.image_url;
-                } catch {
-                    imageUrl = product.image_url;
-                }
-            }
-        }
-
-        jsonLd = {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": product.name,
-            "image": imageUrl ? [imageUrl] : [],
-            "description": product.description || "Todo lo que tu bebé necesita, con el amor que se merece.",
-            "sku": product.code || product.uid,
-            "mpn": product.code || product.uid,
+    const productUrl = `${SITE_URL}/producto/${product.uid}`;
+    const productJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "image": product.images.slice(0, 3),
+        "description": product.description || DEFAULT_DESCRIPTION,
+        "sku": product.code || product.uid,
+        "mpn": product.code || product.uid,
+        "url": productUrl,
+        "brand": { "@type": "Brand", "name": "Cuanto Te Quiero" },
+        ...(product.categories?.name && { "category": product.categories.name }),
+        // Only expose the price to search engines when the store shows prices
+        ...(pricesEnabled && product.price > 0 && {
             "offers": {
                 "@type": "Offer",
-                "url": `https://cuantotequiero.com.ar/producto/${slug}`,
+                "url": productUrl,
                 "priceCurrency": "ARS",
-                "price": product.price || 0,
-                "priceValidUntil": "2027-12-31",
+                "price": product.price,
                 "itemCondition": "https://schema.org/NewCondition",
                 "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
                 "seller": {
@@ -106,18 +89,26 @@ export default async function Page({ params }: Props) {
                     "name": "Cuanto Te Quiero"
                 }
             }
-        };
+        })
+    };
+
+    const crumbs = [{ name: "Inicio", path: "" }];
+    if (product.categories?.name) {
+        const categoryPath = `/categoria/${slugify(product.categories.name)}`;
+        crumbs.push({ name: product.categories.name, path: categoryPath });
+        if (product.subcategories?.name) {
+            crumbs.push({ name: product.subcategories.name, path: `${categoryPath}/${slugify(product.subcategories.name)}` });
+        }
     }
+    crumbs.push({ name: product.name, path: `/producto/${product.uid}` });
 
     return (
         <>
-            {jsonLd && (
-                <script
-                    type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-                />
-            )}
-            <ProductDetailClient slug={slug} />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify([productJsonLd, breadcrumbJsonLd(crumbs)]) }}
+            />
+            <ProductDetailClient product={product} relatedProducts={relatedProducts} />
         </>
     );
 }

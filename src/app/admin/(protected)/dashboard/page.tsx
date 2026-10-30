@@ -14,12 +14,12 @@ export default async function AdminDashboard() {
         { count: giftCardsCount },
         { count: giftCardsUsedCount }
     ] = await Promise.all([
-        supabase.from("products").select("*", { count: "exact", head: true }),
-        supabase.from("products").select("*", { count: "exact", head: true }).lt("stock", 5),
+        supabase.from("products").select("*", { count: "exact", head: true }).eq("active", true),
+        supabase.from("products").select("*", { count: "exact", head: true }).eq("active", true).lt("stock", 5),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("orders").select("*", { count: "exact", head: true }),
-        supabase.from("gift_cards").select("*", { count: "exact", head: true }).eq("is_used", false),
-        supabase.from("gift_cards").select("*", { count: "exact", head: true }).eq("is_used", true)
+        supabase.from("gift_cards").select("*", { count: "exact", head: true }).eq("active", true),
+        supabase.from("gift_cards").select("*", { count: "exact", head: true }).eq("active", false)
     ]);
 
     const stats = [
@@ -31,8 +31,7 @@ export default async function AdminDashboard() {
             iconBg: "#dbeafe",
             iconColor: "#2563eb",
             link: "/admin/orders",
-            alert: (ordersPendingCount || 0) > 0,
-            trend: "+12%"
+            alert: (ordersPendingCount || 0) > 0
         },
         {
             title: "Productos Activos",
@@ -42,8 +41,7 @@ export default async function AdminDashboard() {
             iconBg: "#e9d5ff",
             iconColor: "#9333ea",
             link: "/admin/products",
-            alert: (lowStockCount || 0) > 0,
-            trend: "+5%"
+            alert: (lowStockCount || 0) > 0
         },
         {
             title: "Gift Cards",
@@ -53,8 +51,7 @@ export default async function AdminDashboard() {
             iconBg: "#fce7f3",
             iconColor: "#ec4899",
             link: "/admin/gift-cards",
-            alert: false,
-            trend: "+8%"
+            alert: false
         }
     ];
 
@@ -173,17 +170,6 @@ export default async function AdminDashboard() {
                                     <p className="stat-card-value">
                                         {stat.value}
                                     </p>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.25rem',
-                                        color: '#16a34a',
-                                        fontSize: '0.875rem',
-                                        fontWeight: 'bold'
-                                    }}>
-                                        <ArrowUpRight size={16} />
-                                        {stat.trend}
-                                    </div>
                                 </div>
                                 <p style={{
                                     fontSize: '0.875rem',

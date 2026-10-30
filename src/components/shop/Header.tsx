@@ -6,10 +6,24 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
+import { useCatalogCategories } from "@/components/shop/CatalogContext";
 
 interface Category {
     id: string;
     name: string;
+}
+
+function sortMenuCategories(list: Category[]) {
+    return list.filter(cat => cat.name !== "General").sort((a, b) => {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+
+        if (nameA.includes("MUEBLES")) return -1;
+        if (nameB.includes("MUEBLES")) return 1;
+        if (nameA.includes("BLANQUERIA")) return -1;
+        if (nameB.includes("BLANQUERIA")) return 1;
+        return nameA.localeCompare(nameB);
+    });
 }
 
 export default function Header() {
@@ -17,13 +31,15 @@ export default function Header() {
     const { settings } = useStoreSettings();
     const [categoriesMenuOpen, setCategoriesMenuOpen] = useState(false);
     const [cartCount] = useState(0);
-    const [categories, setCategories] = useState<Category[]>([]);
+    const serverCategories = useCatalogCategories();
+    const [categories, setCategories] = useState<Category[]>(() => sortMenuCategories(serverCategories || []));
     const [searchFocused, setSearchFocused] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
-        fetchCategories();
-    }, []);
+        // Categories normally come from the server; fetch only as a fallback
+        if (!serverCategories) fetchCategories();
+    }, [serverCategories]);
 
     const fetchCategories = async () => {
         try {
@@ -34,19 +50,7 @@ export default function Header() {
 
             if (error) throw error;
 
-            const filteredCategories = (data || []).filter(cat => cat.name !== "General");
-            const sortedCategories = filteredCategories.sort((a, b) => {
-                const nameA = a.name.toUpperCase();
-                const nameB = b.name.toUpperCase();
-
-                if (nameA.includes("MUEBLES")) return -1;
-                if (nameB.includes("MUEBLES")) return 1;
-                if (nameA.includes("BLANQUERIA")) return -1;
-                if (nameB.includes("BLANQUERIA")) return 1;
-                return nameA.localeCompare(nameB);
-            });
-
-            setCategories(sortedCategories);
+            setCategories(sortMenuCategories(data || []));
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
