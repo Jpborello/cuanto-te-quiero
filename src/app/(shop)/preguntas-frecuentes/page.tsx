@@ -4,33 +4,10 @@ import { useState } from "react";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import { ChevronDown, HelpCircle } from "lucide-react";
-
-interface FAQItem {
-    question: string;
-    answer: string;
-}
+import { FAQS as faqs } from "./faqs";
 
 export default function PreguntasFrecuentesPage() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-    const faqs: FAQItem[] = [
-        {
-            question: "¿Tienen devolución?",
-            answer: "Para devoluciones y problemas con productos, por favor contactarse por WhatsApp con nuestro soporte."
-        },
-        {
-            question: "¿Tienen garantía los productos?",
-            answer: "Todo lo que es mueblería trabajamos con productos de alta calidad. Siempre hacemos chequeos frecuentes de nuestros productos para que cuando los tengas que usar o armar no tengas mayores complicaciones."
-        },
-        {
-            question: "¿Los muebles vienen armados?",
-            answer: "Los muebles pueden ir armados o desarmados, siempre dependiendo del producto y el tamaño del mismo."
-        },
-        {
-            question: "¿Vivo en un edificio, ustedes lo suben?",
-            answer: "Sí, contamos con personal para ese servicio. Aun así, siempre consultar previamente con un asesor."
-        }
-    ];
 
     const toggleIndex = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);

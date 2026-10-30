@@ -2,33 +2,36 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
+import { Instagram, Facebook, MapPin } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useCatalogCategories } from "@/components/shop/CatalogContext";
 
 const capitalizeWords = (str: string) => {
     return str.toLowerCase().replace(/(?:^|\s)\S/g, function (a) { return a.toUpperCase(); });
 };
 
+// Exclude "ofertas" and "general" case-insensitively
+const footerCategories = (list: { id: string; name: string }[]) => list.filter(cat => {
+    const nameLower = cat.name.toLowerCase().trim();
+    return nameLower !== "ofertas" && nameLower !== "general";
+});
+
 export default function Footer() {
-    const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+    const serverCategories = useCatalogCategories();
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>(() => footerCategories(serverCategories || []));
 
     useEffect(() => {
+        // Categories normally come from the server; fetch only as a fallback
+        if (serverCategories) return;
         supabase
             .from("categories")
             .select("id, name")
             .eq("active", true)
             .order("name", { ascending: true })
             .then(({ data }) => {
-                if (data) {
-                    // Exclude "ofertas" and "general" case-insensitively
-                    const filtered = data.filter(cat => {
-                        const nameLower = cat.name.toLowerCase().trim();
-                        return nameLower !== "ofertas" && nameLower !== "general";
-                    });
-                    setCategories(filtered);
-                }
+                if (data) setCategories(footerCategories(data));
             });
-    }, []);
+    }, [serverCategories]);
     return (
         <footer style={{
             backgroundColor: '#fafafa',
@@ -300,7 +303,7 @@ export default function Footer() {
                             fontSize: '0.875rem',
                             margin: 0
                         }}>
-                            © 2024 Cuanto Te Quiero. Todos los derechos reservados.
+                            © {new Date().getFullYear()} Cuanto Te Quiero. Todos los derechos reservados.
                         </p>
                         <p style={{
                             color: '#bbb',

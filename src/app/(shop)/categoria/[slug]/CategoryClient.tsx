@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import Link from "next/link";
@@ -22,178 +19,8 @@ interface Category {
     image_url?: string;
 }
 
-export default function CategoryClient() {
-    const params = useParams();
-    const slug = params.slug as string;
-
-    const [category, setCategory] = useState<Category | null>(null);
-    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetchCategoryAndSubcategories();
-    }, [slug]);
-
-    const fetchCategoryAndSubcategories = async () => {
-        try {
-            // Convertir slug a nombre de categoría
-            const categoryName = slug
-                .split('-')
-                .map(word => word.toUpperCase())
-                .join(' ');
-
-            // Buscar categoría con match exacto
-            const { data: categoryData, error: categoryError } = await supabase
-                .from("categories")
-                .select("*")
-                .eq("name", categoryName)
-                .single();
-
-            if (categoryError) throw categoryError;
-            setCategory(categoryData);
-
-            // Buscar subcategorías de esta categoría
-            const { data: subcategoriesData, error: subcategoriesError } = await supabase
-                .from("subcategories")
-                .select("*")
-                .eq("category_id", categoryData.id)
-                .order("name", { ascending: true });
-
-            if (subcategoriesError) throw subcategoriesError;
-
-            // Para cada subcategoría, obtener múltiples imágenes para el carousel
-            const subcategoriesWithImages = await Promise.all(
-                (subcategoriesData || []).map(async (subcategory) => {
-                    // Buscar varios productos de esta subcategoría para el carousel
-                    const { data: productsData } = await supabase
-                        .from("products")
-                        .select(`
-                            image_url,
-                            product_images (
-                                image_url
-                            )
-                        `)
-                        .eq("subcategory_id", subcategory.id)
-                        .eq("active", true)
-                        .limit(4); // Obtener hasta 4 productos
-
-                    // Extraer todas las imágenes disponibles
-                    const allImages: string[] = [];
-
-                    productsData?.forEach(product => {
-                        // Priority 1: Check image_url field first
-                        if (product.image_url) {
-                            if (Array.isArray(product.image_url)) {
-                                allImages.push(...product.image_url);
-                            } else if (typeof product.image_url === 'string') {
-                                try {
-                                    const parsed = JSON.parse(product.image_url);
-                                    if (Array.isArray(parsed)) {
-                                        allImages.push(...parsed);
-                                    } else {
-                                        allImages.push(product.image_url);
-                                    }
-                                } catch {
-                                    allImages.push(product.image_url);
-                                }
-                            }
-                        }
-
-                        // Priority 2: Fallback to product_images table
-                        if (product.product_images && product.product_images.length > 0) {
-                            allImages.push(...product.product_images.map((img: any) => img.image_url));
-                        }
-                    });
-
-                    // Limitar a 4 imágenes máximo y eliminar duplicados
-                    const uniqueImages = [...new Set(allImages)].slice(0, 4);
-
-                    return {
-                        ...subcategory,
-                        images: uniqueImages.length > 0 ? uniqueImages : null
-                    };
-                })
-            );
-
-
-            // Define custom order for Muebles Infantiles
-            const customOrder = [
-                "CUNAS",
-                "CUNAS COLECHO",
-                "CUNAS FUNCIONALES", // Assuming this might exist or user wants it
-                "CAJONERAS",
-                "ROPEROS Y PLACARES",
-                "MONTESSORI",
-                "CAMAS DE 1 PLAZA Y NIDO",
-                "CUCHETAS - RINCONERAS - PUENTE",
-                "ESCRITORIOS"
-            ];
-
-            // Sort subcategories based on custom order
-            const sortedSubcategories = subcategoriesWithImages.sort((a, b) => {
-                // Normalize names for comparison (remove extra spaces, uppercase)
-                const nameA = a.name.trim().toUpperCase();
-                const nameB = b.name.trim().toUpperCase();
-
-                const indexA = customOrder.indexOf(nameA);
-                const indexB = customOrder.indexOf(nameB);
-
-                // If both are in the list, sort by index
-                if (indexA !== -1 && indexB !== -1) {
-                    return indexA - indexB;
-                }
-
-                // If only A is in list, it comes first
-                if (indexA !== -1) return -1;
-
-                // If only B is in list, it comes first
-                if (indexB !== -1) return 1;
-
-                // If neither, sort alphabetically
-                return nameA.localeCompare(nameB);
-            });
-
-            setSubcategories(sortedSubcategories);
-        } catch (error) {
-            console.error("Error fetching category:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    if (loading) {
-        return (
-            <>
-                <Header />
-                <main style={{ minHeight: '100vh', padding: '4rem 2rem' }}>
-                    <div style={{ textAlign: 'center', color: '#999' }}>
-                        <p>Cargando...</p>
-                    </div>
-                </main>
-                <Footer />
-            </>
-        );
-    }
-
-    if (!category) {
-        return (
-            <>
-                <Header />
-                <main style={{ minHeight: '100vh', padding: '4rem 2rem' }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: '1rem' }}>
-                            Categoría no encontrada
-                        </h1>
-                        <p style={{ color: '#666' }}>
-                            La categoría que buscas no existe.
-                        </p>
-                    </div>
-                </main>
-                <Footer />
-            </>
-        );
-    }
-
+// Category and subcategories are loaded on the server (see page.tsx)
+export default function CategoryClient({ category, subcategories }: { category: Category; subcategories: Subcategory[] }) {
     return (
         <>
             <Header />
@@ -236,7 +63,7 @@ export default function CategoryClient() {
                             {subcategories.map((subcategory) => (
                                 <Link
                                     key={subcategory.id}
-                                    href={`/categoria/${slug}/${subcategory.name.toLowerCase().replace(/\s+/g, '-')}`}
+                                    href={`/categoria/${category.name.toLowerCase().replace(/\s+/g, '-')}/${subcategory.name.toLowerCase().replace(/\s+/g, '-')}`}
                                     style={{ textDecoration: 'none' }}
                                 >
                                     <div

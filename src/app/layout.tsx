@@ -35,6 +35,9 @@ export const metadata: Metadata = {
         locale: "es_AR",
         type: "website",
     },
+    twitter: {
+        card: "summary_large_image",
+    },
 };
 
 export default function RootLayout({
@@ -83,6 +86,19 @@ export default function RootLayout({
         ]
     };
 
+    const websiteJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Cuanto Te Quiero",
+        "url": "https://www.cuantotequiero.com.ar",
+        "inLanguage": "es-AR",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.cuantotequiero.com.ar/buscar?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    };
+
     return (
         <html lang="es" suppressHydrationWarning>
             <body className={`${inter.className} ${bubblegumSans.variable}`} suppressHydrationWarning>
@@ -104,7 +120,7 @@ export default function RootLayout({
                 {/* JSON-LD de Google Local Business */}
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, websiteJsonLd]) }}
                 />
                 {children}
             </body>

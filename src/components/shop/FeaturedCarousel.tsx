@@ -15,16 +15,17 @@ interface Product {
     image_url: string | string[] | null;
 }
 
-export default function FeaturedCarousel() {
-    const [products, setProducts] = useState<Product[]>([]);
+export default function FeaturedCarousel({ initialProducts }: { initialProducts?: Product[] }) {
+    const [products, setProducts] = useState<Product[]>(initialProducts || []);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!initialProducts);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const { settings } = useStoreSettings();
 
     useEffect(() => {
-        fetchFeaturedProducts();
-    }, []);
+        // Featured products normally come from the server (home page); fetch only as a fallback
+        if (!initialProducts) fetchFeaturedProducts();
+    }, [initialProducts]);
 
     useEffect(() => {
         if (!isAutoPlaying || products.length === 0) return;

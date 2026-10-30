@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
 import ProductGallery from "@/components/shop/ProductGallery";
@@ -25,116 +23,10 @@ interface Product {
     images: string[];
 }
 
-export default function ProductDetailClient({ slug }: { slug: string }) {
-    const router = useRouter();
+// Product and related products are loaded on the server (see app/(shop)/producto/[slug]/page.tsx)
+export default function ProductDetailClient({ product, relatedProducts }: { product: Product; relatedProducts: Product[] }) {
     const { settings } = useStoreSettings();
-
-    const [product, setProduct] = useState<Product | null>(null);
-    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
-
-    useEffect(() => {
-        fetchProductAndRelated();
-    }, [slug]);
-
-    const fetchProductAndRelated = async () => {
-        try {
-            // Check if slug is UUID
-            const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slug);
-
-            // Fetch main product
-            let query = supabase
-                .from("products")
-                .select(`
-                    *,
-                    categories (name),
-                    subcategories (name, id),
-                    product_images (image_url)
-                `)
-                .eq(isUuid ? "uid" : "code", slug)
-                .eq("active", true);
-
-            let productData;
-            let productError;
-
-            if (isUuid) {
-                const { data, error } = await query.single();
-                productData = data;
-                productError = error;
-            } else {
-                const { data, error } = await query.limit(1);
-                productData = data?.[0];
-                productError = error;
-                // If data is empty array, trigger not found error
-                if (!productData && !error) {
-                    productError = new Error("Product not found");
-                }
-            }
-
-            if (productError) throw productError;
-
-            // Transform images
-            let images: string[] = [];
-            if (productData.image_url) {
-                if (Array.isArray(productData.image_url)) {
-                    images = productData.image_url;
-                } else if (typeof productData.image_url === 'string') {
-                    try {
-                        const parsed = JSON.parse(productData.image_url);
-                        images = Array.isArray(parsed) ? parsed : [productData.image_url];
-                    } catch {
-                        images = [productData.image_url];
-                    }
-                }
-            }
-            if (images.length === 0 && productData.product_images && productData.product_images.length > 0) {
-                images = productData.product_images.map((img: any) => img.image_url);
-            }
-
-            const transformedProduct = {
-                ...productData,
-                images
-            };
-
-            setProduct(transformedProduct);
-
-            // Fetch related products from same subcategory
-            if (productData.subcategories?.id) {
-                const { data: relatedData } = await supabase
-                    .from("products")
-                    .select("*")
-                    .eq("subcategory_id", productData.subcategories.id)
-                    .eq("active", true)
-                    .neq("code", slug)
-                    .limit(4);
-
-                if (relatedData) {
-                    const transformedRelated = relatedData.map(p => {
-                        let imgs: string[] = [];
-                        if (p.image_url) {
-                            if (Array.isArray(p.image_url)) {
-                                imgs = p.image_url;
-                            } else if (typeof p.image_url === 'string') {
-                                try {
-                                    const parsed = JSON.parse(p.image_url);
-                                    imgs = Array.isArray(parsed) ? parsed : [p.image_url];
-                                } catch {
-                                    imgs = [p.image_url];
-                                }
-                            }
-                        }
-                        return { ...p, images: imgs };
-                    });
-                    setRelatedProducts(transformedRelated);
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching product:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const incrementQuantity = () => {
         if (product && quantity < product.stock) {
@@ -147,51 +39,6 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             setQuantity(q => q - 1);
         }
     };
-
-    if (loading) {
-        return (
-            <>
-                <Header />
-                <main style={{ minHeight: '100vh', padding: '4rem 2rem' }}>
-                    <div style={{ textAlign: 'center', color: '#999' }}>
-                        <p>Cargando producto...</p>
-                    </div>
-                </main>
-                <Footer />
-            </>
-        );
-    }
-
-    if (!product) {
-        return (
-            <>
-                <Header />
-                <main style={{ minHeight: '100vh', padding: '4rem 2rem' }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <Package size={80} style={{ color: '#ccc', margin: '0 auto 2rem' }} />
-                        <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: '1rem' }}>
-                            Producto no encontrado
-                        </h1>
-                        <p style={{ color: '#666', marginBottom: '2rem' }}>
-                            El producto que buscas no existe o no está disponible.
-                        </p>
-                        <Link href="/" style={{
-                            display: 'inline-block',
-                            padding: '0.75rem 2rem',
-                            backgroundColor: '#ffc0cb',
-                            color: 'white',
-                            textDecoration: 'none',
-                            borderRadius: '8px',
-                            fontWeight: '600'
-                        }}>
-                            Volver al inicio
-                        </Link>
-                    </div>
-                </main>
-                <Footer />
-            </>
-        );
-    }
 
     return (
         <>
@@ -216,7 +63,13 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                         {product.subcategories && (
                             <>
                                 <ChevronRight size={16} />
-                                <span>{product.subcategories.name}</span>
+                                {product.categories ? (
+                                    <Link href={`/categoria/${product.categories.name.toLowerCase().replace(/\s+/g, '-')}/${product.subcategories.name.toLowerCase().replace(/\s+/g, '-')}`} style={{ color: '#ffc0cb', textDecoration: 'none' }}>
+                                        {product.subcategories.name}
+                                    </Link>
+                                ) : (
+                                    <span>{product.subcategories.name}</span>
+                                )}
                             </>
                         )}
                         <ChevronRight size={16} />

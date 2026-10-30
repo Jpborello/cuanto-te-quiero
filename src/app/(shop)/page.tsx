@@ -1,5 +1,3 @@
-"use client";
-
 import Hero from "@/components/home/Hero";
 import Header from "@/components/shop/Header";
 import Footer from "@/components/shop/Footer";
@@ -8,8 +6,20 @@ import FeaturedCarousel from "@/components/shop/FeaturedCarousel";
 import CategoryBubbles from "@/components/shop/CategoryBubbles";
 import Testimonials from "@/components/home/Testimonials";
 import WelcomeRaffleModal from "@/components/shop/WelcomeRaffleModal";
+import { getFeaturedProducts, getHomeProducts } from "@/lib/catalog";
+import type { Metadata } from "next";
 
-export default function Home() {
+export const metadata: Metadata = {
+    alternates: { canonical: "/" },
+};
+
+export default async function Home() {
+    // Loaded on the server so products are in the HTML for search engines and AI crawlers
+    const [featuredProducts, homeProducts] = await Promise.all([
+        getFeaturedProducts(6),
+        getHomeProducts(8),
+    ]);
+
     return (
         <>
             <WelcomeRaffleModal />
@@ -34,7 +44,7 @@ export default function Home() {
                         }}>
                             Productos Destacados
                         </h3>
-                        <FeaturedCarousel />
+                        <FeaturedCarousel initialProducts={featuredProducts} />
                     </div>
 
                     {/* Categorías (Burbujas) */}
@@ -60,7 +70,7 @@ export default function Home() {
                                 Novedades
                             </h3>
                         </div>
-                        <ProductGrid limit={8} />
+                        <ProductGrid limit={8} initialProducts={homeProducts} />
                     </div>
 
                 </section>

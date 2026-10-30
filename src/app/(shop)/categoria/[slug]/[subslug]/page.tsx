@@ -1,11 +1,7 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import SubcategoryClient from "./SubcategoryClient";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { breadcrumbJsonLd, getSubcategoryBySlugs, getSubcategoryProducts, slugify } from "@/lib/catalog";
 
 interface Props {
     params: Promise<{ slug: string; subslug: string }>;
@@ -13,33 +9,55 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug, subslug } = await params;
+    const found = await getSubcategoryBySlugs(slug, subslug);
 
-    // Convert subslug back to name format for DB query (replaces hyphens with spaces)
-    const dbQueryName = subslug.replace(/-/g, ' ');
+    if (!found) {
+        return { title: "Subcategoría no encontrada | Cuanto Te Quiero", robots: { index: false } };
+    }
 
-    // Fetch the subcategory name from Supabase case-insensitively
-    const { data: subcategory } = await supabase
-        .from("subcategories")
-        .select("name")
-        .ilike("name", dbQueryName)
-        .maybeSingle();
-
-    const name = subcategory?.name || subslug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    const { category, subcategory } = found;
+    const name = subcategory.name;
+    const description = `Encontrá ${name.toLowerCase()} en Rosario. Te ofrecemos productos infantiles, cunas y accesorios hechos con amor para el bienestar de tu bebé.`;
 
     return {
         title: `${name} | Cuanto Te Quiero`,
-        description: `Encontrá ${name} en Rosario. Te ofrecemos productos infantiles, cunas y accesorios hechos con amor para el bienestar de tu bebé.`,
+        description,
         alternates: {
-            canonical: `/categoria/${slug}/${subslug}`,
+            canonical: `/categoria/${slugify(category.name)}/${slugify(name)}`,
         },
         openGraph: {
             title: `${name} | Cuanto Te Quiero`,
-            description: `Encontrá ${name} en Rosario. Te ofrecemos productos infantiles, cunas y accesorios hechos con amor para el bienestar de tu bebé.`,
+            description,
             type: "website",
         }
     };
 }
 
-export default async function Page() {
-    return <SubcategoryClient />;
+export default async function Page({ params }: Props) {
+    const { slug, subslug } = await params;
+    const found = await getSubcategoryBySlugs(slug, subslug);
+
+    if (!found) {
+        notFound();
+    }
+
+    const { category, subcategory } = found;
+    const products = await getSubcategoryProducts(subcategory.id);
+    const categoryPath = `/categoria/${slugify(category.name)}`;
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(breadcrumbJsonLd([
+                        { name: "Inicio", path: "" },
+                        { name: category.name, path: categoryPath },
+                        { name: subcategory.name, path: `${categoryPath}/${slugify(subcategory.name)}` },
+                    ]))
+                }}
+            />
+            <SubcategoryClient subcategory={subcategory} products={products} />
+        </>
+    );
 }
